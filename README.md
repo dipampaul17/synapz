@@ -22,7 +22,7 @@ to get real answers, we do paired experiments:
 *   **adaptive session**: the llm teacher tries to tailor its explanation to a specific learner profile (e.g., using more visuals for a visual learner, or structuring text differently for a dyslexic learner).
 *   **control session**: the same llm teacher explains the same concept to the same (simulated) learner profile, but using a generic, non-adapted style.
 
-we use a `teacheragent` to generate explanations and a `studentsimulator` (backed by an llm and heuristics) to provide feedback on clarity and engagement. a `budgettracker` keeps us honest on api costs, and a `metricscalculator` crunches the numbers. everything gets logged to a sqlite database (in wal mode, because we like our data safe).
+we use a `teacheragent` to generate explanations and a `studentsimulator` (backed by an llm and heuristics) to provide feedback on clarity and engagement. a `budgettracker` keeps us honest on api costs, and a `metricscalculator` crunches the numbers. for instance, our `batch_run_20250518_121146` processed 33 experiment pairs across different profiles and concepts. everything gets logged to a sqlite database (in wal mode, because we like our data safe).
 
 prompts are externalized in the `prompts/` directory – no magic strings in the code.
 
@@ -43,9 +43,9 @@ python -m synapz.evaluate --create-visuals-for results/your_batch_run_id/compile
 ```
 this will create/update a `visualizations` folder next to your report file.
 
-## what we're seeing (insights from `batch_run_20250518_121146`)
+## 📊 key visualizations & insights from `batch_run_20250518_121146`
 
-the hard numbers (p-values, specific averages, etc.) for our latest run are in `results/batch_run_20250518_121146/compiled_batch_results.json` and `experiment_pair_details.csv`. we encourage you to dig in.
+the hard numbers (p-values, specific averages, etc.) for our latest comprehensive run are in `results/batch_run_20250518_121146/compiled_batch_results.json` and the detailed `experiment_pair_details.csv`. we encourage you to dig into these files to see the raw and compiled outputs.
 
 the visualizations in `results/batch_run_20250518_121146/visualizations/` help paint the picture:
 
@@ -91,25 +91,31 @@ the visualizations in `results/batch_run_20250518_121146/visualizations/` help p
 
 **emerging (and often messy) insights:**
 
-1.  **adaptation is not magic**: simply telling an llm to "be adaptive" for a profile like "visual learner" doesn't automatically yield superior explanations. the *quality and specificity* of adaptation strategies in the prompts are paramount. superficial changes (e.g., just adding more bullet points) might not cut it.
-2.  **profiles are not monoliths**: what works for one "adhd learner" simulation might not for another, depending on the concept's nature and the specific adaptive tactics tried. the visualizations might show different adaptive "win rates" or clarity trajectories even within the same broad profile category if we could segment further (e.g., by concept difficulty).
-3.  **simulator fidelity is key (and hard)**: our student simulator (llm + heuristics) tries its best, but it's a proxy. its feedback (clarity, engagement) drives the "measured" success. if the simulator doesn't truly capture a neurodiverse student's interaction patterns, our conclusions are built on a shaky foundation. the heuristic metrics (like abstractness score, sentence length) provide a partial cross-check.
-4.  **"clarity" is multifaceted**: an llm-simulated clarity score is one thing. objective readability scores (like flesch-kincaid from `textstat`) are another. the `effect_sizes.png` might show that adaptive explanations are, say, *more* complex by one metric but perceived as clearer by the simulator. this tension is where interesting insights lie.
-5.  **statistical significance vs. practical impact**: with enough runs, small differences can become statistically significant (low p-values). the `effect_sizes.png` (cohen's d) helps us see if these differences are also practically meaningful. sometimes, an adaptation might be "better" but not by much.
+these points are general observations from the project so far, and you can often see them reflected in the detailed data of runs like `batch_run_20250518_121146` by examining the `experiment_pair_details.csv` and the compiled visualizations:
 
-the journey is iterative. each batch run from `evaluate.py` provides data to refine prompts, simulator logic, and our understanding of what "effective adaptation" even means.
+1.  **adaptation is not magic**: simply telling an llm to "be adaptive" for a profile like "visual learner" doesn't automatically yield superior explanations. the *quality and specificity* of adaptation strategies in the prompts are paramount. superficial changes might not cut it. (examine the `experiment_pair_details.csv` for instances where adaptive scores weren't notably higher than control).
+2.  **profiles are not monoliths**: what works for one "adhd learner" simulation might not for another, depending on the concept's nature and the specific adaptive tactics tried. the visualizations might show different adaptive "win rates" or clarity trajectories even within the same broad profile category. (look for variance in outcomes for the same profile across different concepts in the batch data).
+3.  **simulator fidelity is key (and hard)**: our student simulator (llm + heuristics) tries its best, but it's a proxy. its feedback (clarity, engagement) drives the "measured" success. if the simulator doesn't truly capture a neurodiverse student's interaction patterns, our conclusions are built on a shaky foundation. the heuristic metrics provide a partial cross-check. (consider how different simulated feedback patterns in the raw data contribute to overall scores).
+4.  **"clarity" is multifaceted**: an llm-simulated clarity score is one thing. objective readability scores (like flesch-kincaid from `textstat`) are another. the `effect_sizes.png` might show that adaptive explanations are, say, *more* complex by one metric but perceived as clearer by the simulator. this tension, visible when comparing `readability_metrics.png` and `clarity_progression` charts for `batch_run_20250518_121146`, is where interesting insights lie.
+5.  **statistical significance vs. practical impact**: with enough runs (like the 33 pairs in `batch_run_20250518_121146`), small differences can become statistically significant (low p-values). the `effect_sizes.png` (cohen's d) helps us see if these differences are also practically meaningful. sometimes, an adaptation might be "better" but not by much.
+
+the journey is iterative, and each batch run (like `batch_run_20250518_121146`) is a cycle:
+1.  **analyze results**: we dig into the data (`experiment_pair_details.csv`, `compiled_batch_results.json`) and visualizations from the latest run.
+2.  **refine hypotheses**: based on what worked (or didn't), we update the teaching strategies in `prompts/` and consider tweaks to the `studentsimulator`'s logic or heuristic metrics.
+3.  **test again**: new experiments are run with `evaluate.py` to measure the impact of our refinements.
+this learn-adjust-retest loop is how synapz evolves and deepens its understanding of "effective adaptation."
 
 ## the tricky bits & what's next
 
-this is research, so it's full of challenges:
-*   **getting enough data**: small sample sizes (even 10-15 pairs per profile) make it hard to draw strong statistical conclusions for specific profiles vs. specific concepts. we need more runs.
-*   **defining "good" adaptation**: what specific instructional strategies truly work best for an adhd profile when explaining algebra vs. history? our prompts are hypotheses themselves.
-*   **the cost constraint**: the $50 budget means we can't just run thousands of experiments with the most powerful models. every llm call counts.
+this is research, so it's full of challenges, many of which were apparent during the execution and analysis of `batch_run_20250518_121146`:
+*   **getting enough data**: small sample sizes (even with ~10-11 pairs per profile as in our latest run) make it hard to draw strong statistical conclusions for specific profiles vs. specific concepts. we need more runs to confirm trends.
+*   **defining "good" adaptation**: what specific instructional strategies truly work best for an adhd profile when explaining algebra vs. history? our prompts are hypotheses themselves, and their performance in `batch_run_20250518_121146` gives clues for refinement.
+*   **the cost constraint**: the $50 budget (though extended for the larger run) means we can't just run thousands of experiments with the most powerful models. every llm call counts, a factor carefully managed in all runs.
 
 **immediate focus:**
-1.  **more data, wisely**: run more experiment pairs, perhaps focusing on profiles/concepts where results are currently ambiguous or counterintuitive. use the `--min-pairs-per-profile` flag in `evaluate.py`.
-2.  **prompt refinement**: based on the detailed data in `experiment_pair_details.csv` from the latest run, identify adaptive sessions that underperformed and analyze *why*. update the instruction sets in `prompts/`.
-3.  **simulator enhancements**: can we add more sophisticated heuristics to `studentsimulator` that better correlate with neurodiverse processing? for example, tracking cognitive load indicators beyond simple readability.
+1.  **more data, wisely**: run more experiment pairs, perhaps focusing on profiles/concepts where results from `batch_run_20250518_121146` were ambiguous or counterintuitive. use the `--min-pairs-per-profile` flag in `evaluate.py`.
+2.  **prompt refinement**: based on the detailed data in `experiment_pair_details.csv` from `batch_run_20250518_121146`, identify adaptive sessions that underperformed and analyze *why*. update the instruction sets in `prompts/`.
+3.  **simulator enhancements**: can we add more sophisticated heuristics to `studentsimulator` that better correlate with neurodiverse processing, informed by patterns seen in the latest run data? for example, tracking cognitive load indicators beyond simple readability.
 
 ## 🏗️ project structure
 
