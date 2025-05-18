@@ -12,6 +12,17 @@
   <p><i>if learning isn't adapting to how you think, it isn't really teaching you</i></p>
 </div>
 
+## 📘 about
+
+synapz is a research prototype exploring how large language models can adapt teaching content to different cognitive styles. built over a 48-hour sprint with a strict $50 api budget, this project implements a scientific framework to test whether adaptive teaching produces measurably better results than static approaches.
+
+the project focuses on three cognitive profiles:
+- **adhd learners** (challenges with attention, strengths in creative connections)
+- **dyslexic learners** (text processing difficulties, conceptual understanding strengths)
+- **visual learners** (preference for spatial organization over text)
+
+synapz generates paired explanations of concepts (one adaptive, one static control) and evaluates them using simulated student feedback, objective metrics, and statistical analysis to determine which approach produces better learning outcomes.
+
 ## 🧠 core thesis
 
 **adaptive teaching methodologies tailored to specific neurodiverse cognitive profiles produce measurably superior learning outcomes compared to static one-size-fits-all approaches.**
@@ -98,6 +109,26 @@ the simulation process leverages multiple evaluation mechanisms:
     <tr>
       <td>
         <h4>Adaptive vs Control Win Rate (latest batch)</h4>
+        <div align="center">
+          <table>
+            <tr>
+              <th>Win Type</th>
+              <th>Percentage</th>
+            </tr>
+            <tr>
+              <td>Adaptive Wins</td>
+              <td>40%</td>
+            </tr>
+            <tr>
+              <td>Control Wins</td>
+              <td>46.7%</td>
+            </tr>
+            <tr>
+              <td>Ties</td>
+              <td>13.3%</td>
+            </tr>
+          </table>
+        </div>
         <img src="results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="350" alt="Win Rate">
       </td>
       <td>
@@ -365,6 +396,10 @@ the current prototype provides a foundation for several high-potential research 
 these directions address fundamental questions about personalized learning and the relationship between cognitive diversity and knowledge representation.
 
 > **implementation note:** the most promising immediate direction appears to be improving adaptation mechanisms with more detailed cognitive profiles and interaction-derived RLHF.
+
+## 🏷️ tags
+
+`adaptive-learning` `cognitive-diversity` `llm-education` `neurodiversity` `adhd` `dyslexia` `personalized-learning` `prompt-engineering` `educational-technology` `learning-science` `experiment-design` `statistical-analysis` `python` `gpt-4` `openai-api` `evidence-based-education` `scientific-research`
 
 ## 📑 license
 
