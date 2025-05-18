@@ -169,14 +169,19 @@ the simulation process leverages multiple evaluation mechanisms:
 
 <div align="center">
   <p>
-    <img src="./results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="400" alt="Adaptive vs Control Win Rate Chart">
+    <img src="./results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="500" alt="Adaptive vs Control Win Rate Chart">
   </p>
-  <p>
-    <img src="./results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="400" alt="Effect Sizes Chart">
-  </p>
-  <p>
-    <img src="./results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="400" alt="Readability Metrics Chart">
-  </p>
+  <hr style="border: none; height: 1px; background-color: #333; margin: 20px 0;">
+  <table role="presentation" style="border-collapse: collapse; width: 100%; margin: 0 auto;">
+    <tr>
+      <td style="text-align: center; padding: 10px;">
+        <img src="./results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="380" alt="Effect Sizes Chart">
+      </td>
+      <td style="text-align: center; padding: 10px;">
+        <img src="./results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="380" alt="Readability Metrics Chart">
+      </td>
+    </tr>
+  </table>
 </div>
 
 ## 🔍 initial insights and contradictions
