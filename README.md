@@ -21,16 +21,67 @@ synapz aims to generate concrete, quantifiable evidence of this within tight con
 - ⏱️ 48-hour build timeframe
 - 🖥️ local compute only (m4 macbook)
 
-## 🔬 the experiment
+## 🤔 thought process & origins
 
-synapz runs paired experiments comparing:
+this project emerged from three converging observations:
 
-| adaptive teaching | vs | control teaching |
+1. **neurodiverse students often struggle** with traditional educational approaches designed for neurotypical learners
+   
+2. **personalized education works**, but implementation at scale requires automation and clear evidence
+
+3. **llms have potential to adapt content** based on cognitive profiles, but lack rigorous evaluation
+
+the core question became: can we prove, scientifically and on a limited budget, that adaptive approaches genuinely improve learning outcomes for different cognitive styles?
+
+we specifically chose three distinct cognitive profiles to test:
+- **adhd learners**: challenge with sustained attention but strong creative connections
+- **dyslexic learners**: text processing difficulties but excellent conceptual understanding 
+- **visual learners**: preference for spatial/visual information over text-heavy formats
+
+rather than assuming adaptation works, we built an experimental framework to measure it directly.
+
+## 🔬 experiment design
+
+synapz implements a controlled experimental method with these key design decisions:
+
+```mermaid
+graph TB
+    A[Experimental Design] --> B[Paired Experiments]
+    A --> C[Controlled Variables]
+    A --> D[Objective Metrics]
+    A --> E[Blind Evaluation]
+    
+    B --> F[Same Learner Profile]
+    B --> G[Same Educational Concept]
+    B --> H[Adaptive vs Control]
+    
+    C --> I[Fixed # of Teaching Turns]
+    C --> J[Identical Starting Knowledge]
+    C --> K[Same Model Generation]
+    
+    D --> L[Clarity Ratings]
+    D --> M[Engagement Scores]
+    D --> N[Statistical Significance]
+    
+    E --> O[Student Simulator]
+    E --> P[Heuristic Checks]
+```
+
+each experiment runs pairs:
+
+| adaptive session | vs | control session |
 |---|---|---|
 | adapts to learner's cognitive profile | | static approach for all learners |
 | uses profile-specific prompts | | uses generic prompts |
 | responds to feedback | | minimal adaptation to feedback |
 | tailored for adhd, dyslexic, visual learners | | one-size-fits-all |
+
+the simulation process:
+1. **teacher generates explanation** (adaptive or control)
+2. **student simulator responds** with clarity rating + detailed feedback
+3. **teacher adapts** based on feedback (adaptive) or continues standard pattern (control)
+4. multiple turns occur with increased adaptation/understanding
+5. **objective metrics calculated** to determine which approach worked better
 
 ## 📊 current evidence (batch_run_20250518_091436)
 
@@ -51,17 +102,42 @@ profile-specific insights:
 
 <sup>* small sample size caution</sup>
 
+## 🔍 initial insights and contradictions
+
+our early findings reveal some surprising patterns:
+
+1. **superficial adaptation may not be enough** - merely changing the format (77.9% text difference between adaptive and control) doesn't guarantee better understanding
+
+2. **profile-specific patterns are emerging**:
+   - dyslexic learners show promising initial results with adaptive teaching
+   - visual learners show mixed responses needing deeper investigation
+   - small sample sizes limit confidence in these patterns
+
+3. **simulator quality matters critically** - our current simulated students may not perfectly reflect real cognitive differences
+
+4. **content differentiates but clarity doesn't always improve** - adaptation changes the content substantially, but doesn't consistently improve understanding
+
+## 🛠️ system architecture
+
+the system is designed with careful separation of concerns:
+
 ```mermaid
-graph LR
-    A[Run Experiment] --> B[Teacher Agent Generates Explanation]
-    B --> C[Student Simulator Provides Feedback]
-    C --> D[Clarity Score Recorded]
-    D --> E{More Turns?}
-    E -->|Yes| B
-    E -->|No| F[Calculate Metrics]
-    F --> G[Compare Adaptive vs Control]
-    G --> H[Generate Evidence]
+graph TD
+    A[TeacherAgent] -->|generates content| B[Adaptive Explanations]
+    A -->|generates content| C[Control Explanations] 
+    D[StudentSimulator] -->|evaluates| B
+    D -->|evaluates| C
+    E[Database] -->|stores sessions| F[Paired Experiments]
+    G[MetricsCalculator] -->|analyzes| F
+    H[Budget Tracker] -->|enforces| I[Cost Constraints]
+    J[System Prompts] -->|configure| A
 ```
+
+key components:
+- **teacher agent:** generates explanations using adaptive or control prompts
+- **student simulator:** provides realistic feedback based on cognitive profiles
+- **metrics calculator:** computes statistical measures of teaching effectiveness
+- **budget tracker:** ensures strict api cost enforcement with pre-call projection
 
 ## 🚀 key features
 
@@ -109,12 +185,11 @@ we're committed to honestly pursuing evidence - here's what's needed:
 3. **improve student simulation**
    - ensure feedback genuinely reflects each profile's learning patterns
    - implement more sophisticated heuristics alongside llm judgments
+   - validate against real student data where possible
 
 4. **expand visualization and analysis**
    - develop turn-by-turn clarity progression analysis
    - identify which specific adaptive techniques work best for each profile
-
-> 💡 **key insight:** differentiation alone isn't enough - we're seeing the system generate different content for different profiles (77.9% text difference), but this isn't consistently translating to better outcomes yet.
 
 ## 🏗️ project structure
 
@@ -146,17 +221,26 @@ pip install -r requirements.txt
 export OPENAI_API_KEY='your-api-key'
 ```
 
+## 🔮 future directions
+
+the current prototype is just the beginning. future work will focus on:
+
+1. **deeper cognitive modeling** - more precise simulation of how different brains process information
+
+2. **dynamic adaptation algorithms** - learning from feedback patterns to improve teaching strategies automatically
+
+3. **multimodal content generation** - expanding beyond text to include diagrams, audio, and interactive elements
+
+4. **real-world validation studies** - testing with actual neurodiverse students in controlled educational settings
+
+5. **educational domain expansion** - moving beyond math concepts to language, science, and creative subjects
+
+> 💭 **philosophical note:** this project explores not just how to teach different people, but fundamentally questions what it means to understand something. what counts as "clarity" varies across cognitive styles, suggesting knowledge itself has a neurological dimension worth exploring.
+
 ## 📑 license
 
 mit license
 
-## 🔮 future vision
+---
 
-long-term, synapz aims to:
-
-- achieve "irrefutable evidence" through scaled experiments
-- develop dynamic adaptation that learns from interaction patterns
-- validate with real neurodiverse students in controlled studies
-- expand to cover more subject domains and profile types
-
-the evidence collection journey continues - all contributions welcome 
+contributions welcome! the evidence collection journey continues 
