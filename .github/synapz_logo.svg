@@ -1,25 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-  <style>
-    .brain { fill: #6a50a7; }
-    .connection { stroke: #5dc9e2; stroke-width: 3; stroke-linecap: round; }
-    .text { font-family: Arial, sans-serif; font-weight: bold; }
-    .main-text { fill: #333; font-size: 32px; }
-    .tagline { fill: #666; font-size: 12px; }
-  </style>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8367c7" />
+      <stop offset="100%" stop-color="#5a3a9d" />
+    </linearGradient>
+    <linearGradient id="lightningGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd966" />
+      <stop offset="100%" stop-color="#f0b429" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
   
-  <!-- Brain outline -->
-  <path class="brain" d="M100,30 C140,30 160,60 160,90 C160,120 140,140 120,150 C100,160 80,160 60,150 C40,140 30,120 30,90 C30,60 60,30 100,30 Z" />
+  <!-- Brain outline with gradient -->
+  <path fill="url(#brainGradient)" d="M120,40 C165,40 190,75 190,110 C190,145 165,170 140,182 C115,194 90,194 65,182 C40,170 30,145 30,110 C30,75 65,40 120,40 Z" />
   
-  <!-- Neural connections -->
-  <path class="connection" d="M70,70 C80,60 90,80 100,70" />
-  <path class="connection" d="M80,100 C100,90 110,110 130,100" />
-  <path class="connection" d="M60,80 C80,100 100,80 120,90" />
-  <path class="connection" d="M90,120 C100,100 110,120 120,110" />
+  <!-- Neural connections with glow effect -->
+  <g filter="url(#glow)">
+    <path stroke="#60cdee" stroke-width="2.5" stroke-linecap="round" d="M70,80 C85,65 100,95 115,80" />
+    <path stroke="#60cdee" stroke-width="2.5" stroke-linecap="round" d="M85,120 C110,105 125,135 150,120" />
+    <path stroke="#60cdee" stroke-width="2.5" stroke-linecap="round" d="M60,95 C85,120 110,95 135,108" />
+    <path stroke="#60cdee" stroke-width="2.5" stroke-linecap="round" d="M90,145 C110,120 125,145 145,130" />
+    <path stroke="#60cdee" stroke-width="2.5" stroke-linecap="round" d="M75,105 C95,85 115,115 135,95" />
+  </g>
   
-  <!-- Lightning bolt symbol (representing adaptive learning) -->
-  <path fill="#ffcc00" d="M110,70 L95,100 L107,102 L90,130 L95,110 L85,108 L110,70" />
+  <!-- Lightning bolt symbol with gradient (representing adaptive learning) -->
+  <path fill="url(#lightningGradient)" filter="url(#glow)" d="M130,80 L110,115 L126,118 L100,155 L108,130 L92,127 L130,80" />
   
-  <!-- Text -->
-  <text x="100" y="180" text-anchor="middle" class="text main-text">synapz</text>
-  <text x="100" y="195" text-anchor="middle" class="text tagline">adaptive learning</text>
+  <!-- No text in the SVG - rely on the README to display the name -->
 </svg> 

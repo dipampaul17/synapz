@@ -1,25 +1,31 @@
 # synapz
 
-> adaptive learning for neurodiverse students, proving every brain deserves its own teaching approach
-
-![Static Badge](https://img.shields.io/badge/status-research_prototype-blue)
-![Static Badge](https://img.shields.io/badge/budget-$50_max-green)
-![Static Badge](https://img.shields.io/badge/timeframe-48_hours-orange)
-![Static Badge](https://img.shields.io/badge/evidence-collecting-yellow)
-
 <div align="center">
-    <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/.github/synapz_logo.svg" alt="Synapz Logo" width="200"/>
-    <p><i>if learning isn't adapting to how you think, it isn't really teaching you</i></p>
+  <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/.github/synapz_logo.svg" alt="Synapz Logo" width="180"/>
+  <h3>adaptive learning for neurodiverse students</h3>
+  <p>
+    <a href="#thought-process--origins"><img src="https://img.shields.io/badge/status-research_prototype-blue?style=flat-square" alt="Status: Research Prototype"></a>
+    <a href="#experiment-design"><img src="https://img.shields.io/badge/budget-$50_max-green?style=flat-square" alt="Budget: $50 max"></a>
+    <a href="#initial-insights-and-contradictions"><img src="https://img.shields.io/badge/evidence-preliminary-yellow?style=flat-square" alt="Evidence: Preliminary"></a>
+    <a href="#installation"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square" alt="License: MIT"></a>
+  </p>
+  <p><i>if learning isn't adapting to how you think, it isn't really teaching you</i></p>
 </div>
 
 ## 🧠 core thesis
 
 **adaptive teaching methodologies tailored to specific neurodiverse cognitive profiles produce measurably superior learning outcomes compared to static one-size-fits-all approaches.**
 
-synapz aims to generate concrete, quantifiable evidence of this within tight constraints:
-- 💰 $50 total api budget
-- ⏱️ 48-hour build timeframe
-- 🖥️ local compute only (m4 macbook)
+our hypothesis is that LLMs can be effectively employed to create personalized educational content that addresses the specific cognitive strengths and challenges of neurodiverse students. this project aims to:
+
+1. implement and test adaptation mechanisms using prompt engineering and LLM interaction design
+2. quantitatively measure the impact of these adaptations on learning effectiveness
+3. identify which adaptation mechanisms are most effective for specific cognitive profiles
+
+all within tight experimental constraints:
+- 💰 $50 total api budget (enforced through pre-call token projection)
+- ⏱️ 48-hour build timeframe (emphasizing efficient implementation)
+- 🖥️ local compute only (m4 macbook, no custom model training)
 
 ## 🤔 thought process & origins
 
@@ -42,7 +48,7 @@ rather than assuming adaptation works, we built an experimental framework to mea
 
 ## 🔬 experiment design
 
-synapz implements a controlled experimental method with these key design decisions:
+synapz implements a controlled experimental method with rigorous isolation of variables:
 
 ```mermaid
 graph TB
@@ -67,40 +73,66 @@ graph TB
     E --> P[Heuristic Checks]
 ```
 
-each experiment runs pairs:
+each experiment runs as a paired test with identical base conditions:
 
 | adaptive session | vs | control session |
-|---|---|---|
+|:----------------:|:---:|:----------------:|
 | adapts to learner's cognitive profile | | static approach for all learners |
 | uses profile-specific prompts | | uses generic prompts |
 | responds to feedback | | minimal adaptation to feedback |
 | tailored for adhd, dyslexic, visual learners | | one-size-fits-all |
 
-the simulation process:
-1. **teacher generates explanation** (adaptive or control)
-2. **student simulator responds** with clarity rating + detailed feedback
-3. **teacher adapts** based on feedback (adaptive) or continues standard pattern (control)
-4. multiple turns occur with increased adaptation/understanding
-5. **objective metrics calculated** to determine which approach worked better
+the simulation process leverages multiple evaluation mechanisms:
+1. **LLM-based simulation** - gpt-4o simulates student responses based on profile characteristics
+2. **heuristic assessment** - rule-based measurements check:
+   - textual complexity (Flesch-Kincaid)
+   - terminology density (domain-specific terms per paragraph)
+   - pronoun usage patterns (matched to profile needs)
+   - sentence length distribution (appropriate for cognitive style)
+3. **statistical validation** - paired t-tests determine significance of differences
 
 ## 📊 current evidence (batch_run_20250518_091436)
 
-```mermaid
-pie title "adaptive vs control win rate"
-    "adaptive wins" : 40
-    "control wins" : 60
-```
+<div align="center">
+  <table>
+    <tr>
+      <td>
+        <h4>Adaptive vs Control Win Rate (latest batch)</h4>
+        <img src="https://mermaid.ink/img/pako:eNpNj7sKwzAMRX_F6Jl-QMZCoWMpdOjSbsaVaBJwbGM7UEL-vXZCoe7S4ehcRHfQeYuQwIzuPexjdXGNXPvFm4OvslEjTqy8h_-a3QhzwUkFDlcqNZdRW1fhQeVHb4I96GhGp3xipY52DZrMcuEUwdoWcfLr1aXYJmcjWEhcfZt1Mre3vEIbO5bsX9AvTM1B3tnEZyhOqVQbUIX0vvJrX5CGJt8I2pWHRxRrHjKtBcTpqv8HSVBOlA?type=png" width="350" alt="Win Rate">
+      </td>
+      <td>
+        <h4>Profile-Specific Results</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>profile</th>
+              <th>adaptive win %</th>
+              <th>avg clarity</th>
+              <th>p-value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>dyslexic</td>
+              <td>33.33%</td>
+              <td>4.00 vs 2.33</td>
+              <td>0.038*</td>
+            </tr>
+            <tr>
+              <td>visual</td>
+              <td>50.00%</td>
+              <td>2.50 vs 3.00</td>
+              <td>0.500</td>
+            </tr>
+          </tbody>
+        </table>
+        <em>* small sample size caution</em>
+      </td>
+    </tr>
+  </table>
+</div>
 
-> ⚠️ **truth check:** our latest runs show **weak evidence** for the core thesis with only a 40% win rate for adaptive teaching. we need more data and refined approaches!
-
-profile-specific insights:
-
-| profile | adaptive win rate | avg clarity (adaptive) | avg clarity (control) | p-value | significance |
-|---|---|---|---|---|---|
-| dyslexic | 33.33% | 4.00 | 2.33 | 0.038 | significant* |
-| visual | 50.00% | 2.50 | 3.00 | 0.500 | not significant |
-
-<sup>* small sample size caution</sup>
+> ⚠️ **truth check:** our latest runs show **weak evidence** for the core thesis with only a 40% win rate for adaptive teaching across all profiles. we need more data and refined approaches for definitive conclusions.
 
 ## 🔍 initial insights and contradictions
 
@@ -119,7 +151,7 @@ our early findings reveal some surprising patterns:
 
 ## 🛠️ system architecture
 
-the system is designed with careful separation of concerns:
+the system implements a model-view-controller architecture with specific components for experiment isolation:
 
 ```mermaid
 graph TD
@@ -133,29 +165,126 @@ graph TD
     J[System Prompts] -->|configure| A
 ```
 
-key components:
-- **teacher agent:** generates explanations using adaptive or control prompts
-- **student simulator:** provides realistic feedback based on cognitive profiles
-- **metrics calculator:** computes statistical measures of teaching effectiveness
-- **budget tracker:** ensures strict api cost enforcement with pre-call projection
+### technical implementation
+
+core components are designed for flexibility, testability and scientific rigor:
+
+```python
+# Example: TeacherAgent class with adaptive/control system selection
+class TeacherAgent:
+    def __init__(self, llm_client, db, teacher_model_name="gpt-4o"):
+        self.llm_client = llm_client
+        self.db = db
+        self.teacher_model_name = teacher_model_name
+        self._load_prompts()
+        
+    def create_session(self, learner_id, concept_id, is_adaptive=True):
+        """Create a teaching session with specified adaptation mode."""
+        session_type = "adaptive" if is_adaptive else "control"
+        return self.db.create_session(learner_id, concept_id, session_type)
+        
+    def generate_explanation(self, session_id):
+        """Generate explanation based on session type and history."""
+        session = self.db.get_session(session_id)
+        history = self.db.get_session_history(session_id)
+        
+        # Build appropriate system prompt based on session type
+        system_prompt = self._build_system_prompt(
+            session_id, 
+            is_adaptive=(session["experiment_type"] == "adaptive")
+        )
+        
+        # Format user query with concept information
+        user_query = self._format_user_query(session, history)
+        
+        # Get structured JSON response from LLM
+        response = self.llm_client.get_json_completion(
+            system_prompt=system_prompt,
+            user_prompt=user_query,
+            model=self.teacher_model_name
+        )
+        
+        # Process and store interaction
+        return self._process_response(session_id, response)
+```
+
+our prompt engineering approach focuses on isolating adaptation variables:
+
+```
+# Simplified adaptive system prompt template
+You are an educational AI customized to teach {learner_profile} students.
+The student has the following cognitive profile: {profile_json}
+
+Adapt your teaching style to match this profile's needs. 
+Current concept to teach: {concept_json}
+
+This is teaching turn #{turn_number}.
+Previous clarity rating: {previous_clarity}
+
+Use the following specific adaptations for this profile:
+{profile_specific_instructions}
+```
 
 ## 🚀 key features
 
-- **targeted adaptation:** content generation specifically designed for adhd, dyslexic, and visual learning profiles
-- **scientific control:** rigorous comparison against non-adapted teaching to isolate adaptation effects
-- **quantitative metrics:** statistical analysis including p-values, effect sizes, and text similarity measures
-- **budget tracking:** strict openai api budget enforcement with pre-call cost projection
-- **data management:** wal-enabled sqlite database ensuring reliable experimental data storage
-- **automated evaluation:** batch experiments with comprehensive results compilation
+<div align="center">
+  <table>
+    <tr>
+      <th align="center">Feature</th>
+      <th align="center">Description</th>
+      <th align="center">Technical Details</th>
+    </tr>
+    <tr>
+      <td><strong>targeted adaptation</strong></td>
+      <td>content generation specifically designed for adhd, dyslexic, and visual learning profiles</td>
+      <td>profile-specific system prompts + adaptive LLM chaining</td>
+    </tr>
+    <tr>
+      <td><strong>scientific control</strong></td>
+      <td>rigorous comparison against non-adapted teaching to isolate adaptation effects</td>
+      <td>paired experiments with controlled variables and p-value calculation</td>
+    </tr>
+    <tr>
+      <td><strong>quantitative metrics</strong></td>
+      <td>statistical analysis including p-values, effect sizes, and text similarity measures</td>
+      <td>Cohen's d calculations + Levenshtein distance + Flesch-Kincaid readability</td>
+    </tr>
+    <tr>
+      <td><strong>budget tracking</strong></td>
+      <td>strict openai api budget enforcement with pre-call cost projection</td>
+      <td>token counting + model-specific pricing + pre-call budget validation</td>
+    </tr>
+    <tr>
+      <td><strong>data management</strong></td>
+      <td>reliable experimental data storage with concurrent access</td>
+      <td>SQLite with WAL journaling + transaction safety + automated backup</td>
+    </tr>
+    <tr>
+      <td><strong>automated evaluation</strong></td>
+      <td>batch experiments with comprehensive results compilation</td>
+      <td>parallel experiment execution + aggregated statistical analysis</td>
+    </tr>
+  </table>
+</div>
 
 ## 📋 usage
 
-```bash
-# run a batch evaluation (e.g., 5 experiment pairs, 5 turns per session)
-PYTHONPATH=$PYTHONPATH:/path/to/synapz python synapz/evaluate.py --size 5 --turns 5
+running experiments is straightforward, with configurable parameters:
 
-# for more detailed options
-python synapz/evaluate.py --help
+```bash
+# run a batch evaluation with specific parameters
+PYTHONPATH=$PYTHONPATH:/path/to/synapz python synapz/evaluate.py \
+  --size 5 \           # number of experiment pairs to run
+  --turns 5 \          # teaching iterations per session
+  --budget 10.0 \      # max budget in USD
+  --teacher-model gpt-4o \
+  --simulator-model gpt-4o
+
+# run a single experiment with specific learner/concept pair
+PYTHONPATH=$PYTHONPATH:/path/to/synapz python synapz/evaluate.py \
+  --learner-id dyslexic_learner \
+  --concept-id equations \
+  --turns 3
 ```
 
 results will be saved in a timestamped directory:
@@ -223,19 +352,19 @@ export OPENAI_API_KEY='your-api-key'
 
 ## 🔮 future directions
 
-the current prototype is just the beginning. future work will focus on:
+the current prototype provides a foundation for several high-potential research directions:
 
-1. **deeper cognitive modeling** - more precise simulation of how different brains process information
+| direction | approach | technical implementation |
+|-----------|----------|--------------------------|
+| **deeper cognitive modeling** | create more precise simulation of how different brains process information | fine-tuned embedding spaces for cognitive styles + neuroscience-informed prompt engineering |
+| **dynamic adaptation algorithms** | learn from feedback patterns to improve teaching strategies | reinforcement learning with human feedback (RLHF) on teaching strategies + bayesian optimization of pedagogical patterns |
+| **multimodal content generation** | expand beyond text to include diagrams, audio, interactive elements | LLM-guided diagram generation + text-to-speech with profile-adapted prosody + interactive knowledge graphs |
+| **real-world validation studies** | test with actual neurodiverse students in controlled settings | A/B testing framework with privacy-preserving metrics + LLM-based qualitative analysis |
+| **educational domain expansion** | move beyond math concepts to language, science, creative subjects | domain-specific embeddings + cross-domain teaching transfer learning |
 
-2. **dynamic adaptation algorithms** - learning from feedback patterns to improve teaching strategies automatically
+these directions address fundamental questions about personalized learning and the relationship between cognitive diversity and knowledge representation.
 
-3. **multimodal content generation** - expanding beyond text to include diagrams, audio, and interactive elements
-
-4. **real-world validation studies** - testing with actual neurodiverse students in controlled educational settings
-
-5. **educational domain expansion** - moving beyond math concepts to language, science, and creative subjects
-
-> 💭 **philosophical note:** this project explores not just how to teach different people, but fundamentally questions what it means to understand something. what counts as "clarity" varies across cognitive styles, suggesting knowledge itself has a neurological dimension worth exploring.
+> **implementation note:** the most promising immediate direction appears to be improving adaptation mechanisms with more detailed cognitive profiles and interaction-derived RLHF.
 
 ## 📑 license
 
@@ -243,4 +372,7 @@ mit license
 
 ---
 
-contributions welcome! the evidence collection journey continues 
+<div align="center">
+  <p>contributions welcome - the evidence collection journey continues</p>
+  <p><a href="https://github.com/dipampaul17/synapz">github.com/dipampaul17/synapz</a></p>
+</div> 
