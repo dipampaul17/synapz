@@ -1,7 +1,7 @@
 # synapz
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/.github/synapz_logo.svg" alt="Synapz Logo" width="180"/>
+  <img src=".github/synapz_logo.svg" alt="Synapz Logo" width="180"/>
   <h3>adaptive learning for neurodiverse students</h3>
   <p>
     <a href="#thought-process--origins"><img src="https://img.shields.io/badge/status-research_prototype-blue?style=flat-square" alt="Status: Research Prototype"></a>
@@ -98,7 +98,7 @@ the simulation process leverages multiple evaluation mechanisms:
     <tr>
       <td>
         <h4>Adaptive vs Control Win Rate (latest batch)</h4>
-        <img src="https://mermaid.ink/img/pako:eNpNj7sKwzAMRX_F6Jl-QMZCoWMpdOjSbsaVaBJwbGM7UEL-vXZCoe7S4ehcRHfQeYuQwIzuPexjdXGNXPvFm4OvslEjTqy8h_-a3QhzwUkFDlcqNZdRW1fhQeVHb4I96GhGp3xipY52DZrMcuEUwdoWcfLr1aXYJmcjWEhcfZt1Mre3vEIbO5bsX9AvTM1B3tnEZyhOqVQbUIX0vvJrX5CGJt8I2pWHRxRrHjKtBcTpqv8HSVBOlA?type=png" width="350" alt="Win Rate">
+        <img src="results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="350" alt="Win Rate">
       </td>
       <td>
         <h4>Profile-Specific Results</h4>
@@ -375,4 +375,8 @@ mit license
 <div align="center">
   <p>contributions welcome - the evidence collection journey continues</p>
   <p><a href="https://github.com/dipampaul17/synapz">github.com/dipampaul17/synapz</a></p>
+  <p>
+    <img src="results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="300" alt="Effect Sizes">
+    <img src="results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="300" alt="Readability Metrics">
+  </p>
 </div> 
