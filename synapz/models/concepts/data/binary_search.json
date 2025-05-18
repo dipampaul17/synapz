@@ -1,0 +1,73 @@
+{
+  "id": "binary_search",
+  "title": "Binary Search Algorithm",
+  "difficulty": 3,
+  "description": "Binary search is an efficient algorithm for finding an item from a sorted list of items. It works by repeatedly dividing in half the portion of the list that could contain the item, until you've narrowed down the possible locations to just one. It is a classic example of a 'divide and conquer' strategy.",
+  "key_ideas": [
+    "Sorted Input: Binary search exclusively works on sorted collections (arrays, lists).",
+    "Divide and Conquer: The search interval is halved in each step.",
+    "Midpoint Comparison: The target value is compared with the middle element of the current interval.",
+    "Interval Adjustment: If the target is less than the midpoint, search the left half; if greater, search the right half.",
+    "Logarithmic Time Complexity: O(log n) in the worst-case, making it very fast for large datasets.",
+    "Iterative or Recursive: Can be implemented either iteratively (using a loop) or recursively."
+  ],
+  "examples": [
+    {
+      "type": "Simple Search (Iterative)",
+      "problem": "Find the index of the number 23 in the sorted array: [4, 7, 10, 13, 16, 19, 22, 23, 25, 28, 30].",
+      "solution_steps": [
+        "1. Initial interval: low = 0 (value 4), high = 10 (value 30).",
+        "2. Mid = (0+10)//2 = 5. Array[5] = 19. Since 23 > 19, new low = mid + 1 = 6.",
+        "3. Interval: low = 6 (value 22), high = 10 (value 30).",
+        "4. Mid = (6+10)//2 = 8. Array[8] = 25. Since 23 < 25, new high = mid - 1 = 7.",
+        "5. Interval: low = 6 (value 22), high = 7 (value 23).",
+        "6. Mid = (6+7)//2 = 6. Array[6] = 22. Since 23 > 22, new low = mid + 1 = 7.",
+        "7. Interval: low = 7 (value 23), high = 7 (value 23).",
+        "8. Mid = (7+7)//2 = 7. Array[7] = 23. Target found at index 7."
+      ],
+      "result": "Index 7",
+      "explanation": "The algorithm repeatedly narrows the search range until the target is found or the range becomes empty."
+    },
+    {
+      "type": "Target Not Found",
+      "problem": "Find the index of the number 11 in the sorted array: [2, 5, 8, 12, 16, 23, 38, 56, 72, 91].",
+      "solution_steps": [
+        "1. low = 0 (2), high = 9 (91). mid = 4 (16). 11 < 16, so high = 3 (12).",
+        "2. low = 0 (2), high = 3 (12). mid = 1 (5). 11 > 5, so low = 2 (8).",
+        "3. low = 2 (8), high = 3 (12). mid = 2 (8). 11 > 8, so low = 3 (12).",
+        "4. low = 3 (12), high = 3 (12). mid = 3 (12). 11 < 12, so high = 2.",
+        "5. Now low = 3, high = 2. Since low > high, the target is not in the array."
+      ],
+      "result": "Not found (or -1, depending on implementation convention).",
+      "explanation": "When the 'low' index crosses the 'high' index, it means the element is not present in the array."
+    }
+  ],
+  "common_misconceptions": [
+    "Applying to Unsorted Arrays: Binary search will produce incorrect results or fail if the array is not sorted beforehand.",
+    "Off-by-One Errors: Incorrectly updating 'low' or 'high' indices (e.g., mid instead of mid+1 or mid-1) is a common bug.",
+    "Infinite Loops: Errors in loop conditions or index updates can lead to infinite loops, especially if the interval doesn't shrink.",
+    "Handling Duplicates: Standard binary search finds *an* occurrence of the target. Finding the first or last occurrence requires modification.",
+    "Assuming it's always the best: For very small arrays, a linear search might be faster due to lower overhead."
+  ],
+  "real_world_applications": [
+    "Searching in Databases: Efficiently finding records in indexed database tables.",
+    "File System Searches: Locating files or data within sorted directory structures.",
+    "Dictionary/Lookup: Finding definitions or entries in sorted dictionaries or phone books.",
+    "Version Control Systems: Finding specific commits or changes in a sorted history (e.g., git bisect).",
+    "Debugging: Identifying the point where a regression was introduced by searching through a sorted list of code changes (e.g., bisecting commits)."
+  ],
+  "prerequisites": [
+    "Understanding of arrays/lists.",
+    "Concept of sorted data.",
+    "Basic loop structures (while/for).",
+    "Familiarity with algorithmic thinking."
+  ],
+  "tags": [
+    "algorithm",
+    "search",
+    "divide and conquer",
+    "sorted array",
+    "logarithmic",
+    "efficiency"
+  ]
+}

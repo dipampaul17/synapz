@@ -1,0 +1,89 @@
+{
+  "id": "exponents",
+  "title": "Exponents and Logarithms",
+  "difficulty": 4,
+  "description": "Exponents indicate how many times a base number is multiplied by itself. For example, in bⁿ, 'b' is the base and 'n' is the exponent. Logarithms are the inverse operation of exponentiation. The logarithm of a number 'x' to a base 'b' (written as logₘ(x)) is the exponent to which 'b' must be raised to produce 'x'. They are crucial for solving exponential equations and analyzing phenomena with exponential growth or decay.",
+  "key_ideas": {
+    "exponents": [
+      "Base: The number being multiplied.",
+      "Exponent (or Power/Index): The number of times the base is multiplied by itself.",
+      "Exponential Form: bⁿ (e.g., 2³).",
+      "Expanded Form: b * b * ... * b (n times) (e.g., 2 * 2 * 2)."
+    ],
+    "logarithms": [
+      "Logarithmic Form: y = logₘ(x) is equivalent to Exponential Form: x = bʸ.",
+      "Base of Logarithm: The 'b' in logₘ(x). Common bases are 10 (common logarithm, log) and 'e' (natural logarithm, ln).",
+      "Argument of Logarithm: The 'x' in logₘ(x), which must be positive."
+    ]
+  },
+  "properties_of_exponents": [
+    "Product Rule: bᵐ * bⁿ = bᵐ⁺ⁿ (e.g., 2³ * 2² = 2⁵)",
+    "Quotient Rule: bᵐ / bⁿ = bᵐ⁻ⁿ (e.g., 2⁵ / 2² = 2³)",
+    "Power Rule: (bᵐ)ⁿ = bᵐⁿ (e.g., (2²)³ = 2⁶)",
+    "Power of a Product Rule: (ab)ⁿ = aⁿbⁿ (e.g., (2*3)² = 2² * 3²)",
+    "Power of a Quotient Rule: (a/b)ⁿ = aⁿ/bⁿ (e.g., (2/3)² = 2²/3²)",
+    "Zero Exponent: b⁰ = 1 (for b ≠ 0) (e.g., 5⁰ = 1)",
+    "Negative Exponent: b⁻ⁿ = 1/bⁿ (e.g., 2⁻³ = 1/2³ = 1/8)",
+    "Fractional Exponent (Roots): b^(m/n) = ⁿ√(bᵐ) (e.g., 8^(2/3) = ³√(8²) = ³√64 = 4)"
+  ],
+  "properties_of_logarithms": [
+    "Product Rule: logₘ(xy) = logₘ(x) + logₘ(y) (e.g., log₂(4*8) = log₂(4) + log₂(8) = 2 + 3 = 5)",
+    "Quotient Rule: logₘ(x/y) = logₘ(x) - logₘ(y) (e.g., log₂(16/2) = log₂(16) - log₂(2) = 4 - 1 = 3)",
+    "Power Rule: logₘ(xⁿ) = n * logₘ(x) (e.g., log₂(4³) = 3 * log₂(4) = 3 * 2 = 6)",
+    "Change of Base Formula: logₘ(x) = logₜ(x) / logₜ(b) (e.g., log₂(100) = log₁₀(100) / log₁₀(2) = 2 / 0.30103 ≈ 6.64)",
+    "logₘ(b) = 1 (e.g., log₂(2) = 1)",
+    "logₘ(1) = 0 (e.g., log₂(1) = 0)"
+  ],
+  "examples": [
+    {
+      "type": "Basic Exponentiation",
+      "problem": "Calculate 3⁴",
+      "solution": "3⁴ = 3 * 3 * 3 * 3 = 81",
+      "explanation": "The base 3 is multiplied by itself 4 times."
+    },
+    {
+      "type": "Basic Logarithm",
+      "problem": "Find log₂(8)",
+      "solution": "We need to find the power to which 2 must be raised to get 8. Since 2³ = 8, log₂(8) = 3.",
+      "explanation": "Logarithms ask 'what exponent gives me this number?'"
+    },
+    {
+      "type": "Solving Exponential Equation with Logarithms",
+      "problem": "Solve for x: 2ˣ = 16",
+      "solution_steps": [
+        "Take the logarithm of both sides (base 2 is convenient here): log₂(2ˣ) = log₂(16)",
+        "Using the power rule for logarithms (logₘ(xⁿ) = n * logₘ(x)): x * log₂(2) = log₂(16)",
+        "Since log₂(2) = 1 and log₂(16) = 4 (because 2⁴ = 16): x * 1 = 4",
+        "x = 4"
+      ],
+      "explanation": "Logarithms are used to bring the variable down from the exponent."
+    },
+    {
+      "type": "Using Exponent Properties (Product Rule)",
+      "problem": "Simplify: (5x³y²)(2x⁴y)",
+      "solution_steps": [
+        "Group coefficients and like variables: (5*2) * (x³*x⁴) * (y²*y¹)",
+        "Multiply coefficients: 10",
+        "Apply product rule for exponents (add exponents): x^(3+4) = x⁷ and y^(2+1) = y³",
+        "Result: 10x⁷y³"
+      ],
+      "explanation": "When multiplying terms with the same base, add their exponents."
+    }
+  ],
+  "common_misconceptions": [
+    "Confusing xⁿ with n*x (e.g., 2³ is 8, not 6).",
+    "Incorrectly applying exponent rules, especially with negative or fractional exponents.",
+    "Thinking log(x+y) = log(x) + log(y) (this is incorrect; the product rule is log(xy) = log(x) + log(y)).",
+    "The logarithm of a negative number or zero is undefined in real numbers.",
+    "Forgetting the base of a logarithm (common log is base 10, natural log is base e)."
+  ],
+  "real_world_applications": [
+    "Compound interest calculations (exponential growth).",
+    "Radioactive decay modeling (exponential decay).",
+    "Measuring earthquake intensity (Richter scale - logarithmic).",
+    "Measuring sound intensity (decibels - logarithmic).",
+    "Population growth models.",
+    "Computer algorithm complexity (e.g., O(log n), O(n²))."
+  ],
+  "prerequisites": ["Understanding of multiplication and division", "Basic algebra (variables, expressions)", "Understanding of inverse operations"]
+}

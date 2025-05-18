@@ -1,0 +1,80 @@
+{
+  "id": "systems",
+  "title": "Systems of Equations",
+  "difficulty": 3,
+  "description": "A system of equations is a set of two or more equations that share the same variables. Solving a system of equations means finding a set of values for the variables that simultaneously satisfy all equations in the system. Geometrically, for a system of two linear equations with two variables, the solution represents the point(s) of intersection of their graphs.",
+  "key_ideas": [
+    "Simultaneous Equations: All equations in the system must be true for the same set of variable values.",
+    "Solution: An ordered set of values (e.g., an ordered pair (x,y) for two variables, an ordered triple (x,y,z) for three) that satisfies every equation in the system.",
+    "Consistent System: A system that has at least one solution.",
+    "Inconsistent System: A system that has no solution (e.g., parallel lines that never intersect).",
+    "Dependent System: A system that has infinitely many solutions (e.g., two equations representing the same line).",
+    "Independent System: A consistent system with exactly one solution."
+  ],
+  "methods_for_solving_linear_systems": [
+    {
+      "name": "Graphing Method",
+      "description": "Graph each equation on the same coordinate plane. The point(s) of intersection represent the solution(s). Best for visualizing and for simple systems with integer solutions.",
+      "example_scenario": "System: y = x + 1 and y = -x + 3. Graphing these lines shows they intersect at (1, 2), which is the solution."
+    },
+    {
+      "name": "Substitution Method",
+      "description": "Solve one equation for one variable in terms of the other(s). Substitute this expression into the other equation(s). Solve the resulting equation, then back-substitute to find the other variable(s).",
+      "example_problem": "Solve: {x + y = 5, y = x + 1}",
+      "solution_steps": [
+        "Substitute y = x + 1 into the first equation: x + (x + 1) = 5",
+        "Solve for x: 2x + 1 = 5  =>  2x = 4  =>  x = 2.",
+        "Back-substitute x = 2 into y = x + 1: y = 2 + 1 = 3.",
+        "Solution: (2, 3)."
+      ]
+    },
+    {
+      "name": "Elimination Method (or Addition/Linear Combination Method)",
+      "description": "Multiply one or both equations by constants so that the coefficients of one variable are opposites. Add the equations together to eliminate that variable. Solve for the remaining variable, then back-substitute.",
+      "example_problem": "Solve: {2x + 3y = 7, x - y = 1}",
+      "solution_steps": [
+        "Multiply the second equation by 3: 3(x - y) = 3(1)  =>  3x - 3y = 3.",
+        "Add the modified second equation to the first equation: (2x + 3y) + (3x - 3y) = 7 + 3",
+        "5x = 10  =>  x = 2.",
+        "Back-substitute x = 2 into x - y = 1: 2 - y = 1  =>  -y = -1  =>  y = 1.",
+        "Solution: (2, 1)."
+      ]
+    },
+    {
+      "name": "Matrix Method (using Augmented Matrices and Row Operations, or Inverse Matrices)",
+      "description": "Represent the system as an augmented matrix [A|B] and use Gaussian elimination or Gauss-Jordan elimination to solve. Alternatively, if it's a system AX=B, find X = A⁻¹B if A is invertible. More advanced, typically for systems with more variables.",
+      "example_scenario": "Used for larger systems, e.g., 3 equations with 3 variables. Involves operations like swapping rows, multiplying a row by a scalar, adding a multiple of one row to another."
+    }
+  ],
+  "examples": [
+    {
+      "type": "Consistent and Independent System (One Solution)",
+      "system": "{x + y = 5, 2x - y = 4}",
+      "solution": "x=3, y=2. The lines intersect at a single point (3,2)."
+    },
+    {
+      "type": "Inconsistent System (No Solution)",
+      "system": "{x + y = 3, x + y = 1}",
+      "solution": "No solution. If you try to solve, you might get a contradiction like 0 = 2. The lines are parallel and distinct."
+    },
+    {
+      "type": "Dependent System (Infinite Solutions)",
+      "system": "{x + y = 2, 2x + 2y = 4}",
+      "solution": "Infinite solutions. The second equation is just twice the first; they represent the same line. The solution can be expressed as y = 2 - x, where x can be any real number."
+    }
+  ],
+  "common_misconceptions": [
+    "Making arithmetic errors during substitution or elimination.",
+    "Incorrectly multiplying an entire equation when trying to eliminate a variable.",
+    "Stopping after finding the value of only one variable; a solution requires values for all variables.",
+    "Misinterpreting the meaning of an inconsistent (0 = non-zero number) or dependent (0 = 0) system outcome."
+  ],
+  "real_world_applications": [
+    "Resource allocation: Determining how to allocate limited resources to meet certain demands.",
+    "Mixture problems: Finding the amounts of different substances to create a desired mixture (e.g., in chemistry or cooking).",
+    "Break-even analysis: Finding the point where cost equals revenue in business.",
+    "Navigation and GPS: Systems of equations are used in trilateration to determine location.",
+    "Circuit analysis: Solving for currents and voltages in electrical circuits."
+  ],
+  "prerequisites": ["Understanding of linear equations and their graphs", "Algebraic manipulation (solving for a variable, substitution)", "Basic arithmetic"]
+}

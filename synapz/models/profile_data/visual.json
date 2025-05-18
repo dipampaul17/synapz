@@ -1,0 +1,68 @@
+{
+  "id": "visual",
+  "name": "Alex (Visual Profile)",
+  "cognitive_style": "visual",
+  "description": "Alex is a visual learner who excels when information is presented spatially and through imagery, diagrams, and visual metaphors. They think in pictures and build strong mental models from visual input.",
+  "visual_processing_strengths": {
+    "spatial_reasoning": "Excellent at understanding and manipulating spatial relationships, interpreting maps, charts, and diagrams.",
+    "visual_memory": "Strong memory for information that is presented visually. Can recall details from images, layouts, and visual patterns.",
+    "pattern_recognition": "Quickly identifies visual patterns, trends, and anomalies in data or images."
+  },
+  "modality_reliance": {
+    "primary_modality": "Visual. Learns best by seeing.",
+    "secondary_modality_support": "Kinesthetic (learning by doing, interacting with visual models) can be supportive. Auditory information is best when paired with visual aids.",
+    "challenges_with_non_visual": "May struggle to retain or deeply process purely auditory or text-heavy information without visual support. Long lectures or dense readings without illustrations can be difficult."
+  },
+  "information_organization": "Prefers information organized spatially. Benefits from hierarchies, flowcharts, mind maps, and content laid out with clear visual structure. Responds well to color-coding and visual cues for importance or categorization.",
+  "learning_preferences": [
+    "Diagrams, charts, graphs, and infographics",
+    "Mind maps and concept maps for organizing ideas",
+    "Videos, animations, and visual simulations",
+    "Color-coding and highlighting key information",
+    "Content with strong visual layout and design (clear headings, use of white space, illustrative images)",
+    "Opportunities to create their own visual representations of concepts (drawing, diagramming)",
+    "Visual metaphors and analogies"
+  ],
+  "communication_needs": {
+    "instruction_delivery": "Prefers instructions that include visual components (e.g., diagrams of steps, screenshots). Written instructions should be well-formatted with visual breaks.",
+    "expressing_understanding": "May prefer to demonstrate understanding through visual means (e.g., creating a presentation, drawing a diagram, building a model) over purely written or oral responses."
+  },
+  "strengths": [
+    "Excellent spatial awareness and reasoning",
+    "Strong ability to visualize concepts and processes mentally",
+    "High capacity for recalling visual details",
+    "Good at understanding complex systems when presented visually",
+    "Often artistic or skilled in design-related tasks",
+    "Integrates information effectively when it's visually structured"
+  ],
+  "challenges": [
+    "Processing and retaining information from purely auditory lectures or discussions without visual aids",
+    "Learning from dense, text-heavy materials lacking illustrations or diagrams",
+    "Following complex verbal instructions without visual reference points",
+    "May overlook details in text if not visually emphasized",
+    "Abstract concepts that are difficult to visualize without concrete imagery or metaphors"
+  ],
+  "motivation_triggers": [
+    "Visually appealing and well-designed learning materials",
+    "Opportunities to engage with content visually (e.g., interactive diagrams, building models)",
+    "Clear visual pathways through complex information",
+    "Recognition for visual thinking or creative visual solutions",
+    "Seeing the 'big picture' visually before diving into details"
+  ],
+  "effective_teaching_strategies": [
+    "Using whiteboards or digital drawing tools extensively to illustrate concepts.",
+    "Incorporating charts, graphs, diagrams, and photos into presentations and materials.",
+    "Encouraging the learner to create their own visual notes (sketchnotes, mind maps).",
+    "Using video and animation to explain processes or dynamic concepts.",
+    "Employing color-coding to highlight patterns, categories, or important information.",
+    "Structuring information spatially on a page or screen (e.g., using columns, grids).",
+    "Providing visual outlines or roadmaps for complex topics.",
+    "Using visual metaphors and analogies to explain abstract ideas."
+  ],
+  "assessment_needs": [
+    "Excels with tasks that involve interpreting visual data (charts, graphs).",
+    "Benefits from assessments that allow for visual responses (e.g., drawing diagrams, creating presentations).",
+    "Multiple-choice questions with visual options or diagrams can be effective.",
+    "Essay questions may be more accessible if the learner can first create a visual outline or mind map."
+  ]
+}

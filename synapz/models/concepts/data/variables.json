@@ -1,0 +1,53 @@
+{
+  "id": "variables",
+  "title": "Variables and Constants",
+  "difficulty": 1,
+  "description": "Variables are symbols (typically letters like x, y, or a) that represent quantities that can change or take on different values within a mathematical expression or equation. Constants are specific, fixed numerical values that do not change throughout a problem (e.g., 5, -2, \u03c0). Understanding the distinction is fundamental to algebra, as variables allow us to generalize relationships and solve for unknowns, while constants provide the fixed parameters of those relationships.",
+  "key_ideas": [
+    "Symbolic Representation: Variables use letters or symbols to stand in for numbers.",
+    "Unknown Values: Variables often represent quantities we need to find or solve for.",
+    "Changing Values: The value of a variable can vary depending on the context or equation.",
+    "Fixed Values: Constants maintain their value throughout a specific problem or context.",
+    "Generalization: Variables enable the creation of general formulas and rules applicable to many situations.",
+    "Placeholders: Variables can be seen as placeholders for numbers until their specific value is determined or assigned."
+  ],
+  "examples": [
+    {
+      "type": "Simple Identification",
+      "problem": "Identify the variables and constants in the expression: 3a - 7 + b",
+      "solution": "Variables: a, b. Constants: 3, -7.",
+      "explanation": "Letters 'a' and 'b' can represent different numbers, so they are variables. '3' (coefficient of 'a') and '-7' are fixed numbers, hence constants."
+    },
+    {
+      "type": "Equation Context",
+      "problem": "In the equation for a line, y = mx + c, identify the variables and parameters often treated as constants for a specific line.",
+      "solution": "'x' and 'y' are variables representing coordinates on the line. 'm' (slope) and 'c' (y-intercept) are parameters that are constant for a specific line but can change to define different lines.",
+      "explanation": "As you move along a line, 'x' and 'y' change. However, for any single given line, its slope 'm' and y-intercept 'c' are fixed."
+    },
+    {
+      "type": "Formula Application",
+      "problem": "The perimeter P of a rectangle is given by P = 2l + 2w. If the length l is 5 units and the width w is 3 units, what is the perimeter? Identify variables and constants in this specific calculation.",
+      "solution": "P = 2(5) + 2(3) = 10 + 6 = 16 units. In the formula P = 2l + 2w, P, l, and w are variables. The number 2 is a constant. In this specific calculation, l=5 and w=3 are treated as specific values of the variables.",
+      "explanation": "The formula itself uses l and w as variables. When we assign them values, we are evaluating the expression for a specific case."
+    }
+  ],
+  "common_misconceptions": [
+    "Confusing variables with specific unknown numbers: While variables often represent unknowns we solve for, their nature is that they *can* vary. The solution to an equation is a specific value a variable takes in that context.",
+    "Thinking coefficients are variables: In an term like '3x', 'x' is the variable and '3' is a constant coefficient modifying the variable.",
+    "Assuming a letter always means the same variable: 'x' in one problem might be different from 'x' in another unless specified.",
+    "Treating all letters as variables: In physics formulas like E=mc\u00b2, 'E' and 'm' are variables (energy and mass), but 'c' (speed of light) is a universal physical constant."
+  ],
+  "real_world_applications": [
+    "Programming: Variables store data that can change during program execution (e.g., user input, scores).",
+    "Finance: Formulas for interest calculation use variables for principal, rate, and time.",
+    "Science: Experiments use variables to represent different factors being tested and measured (e.g., temperature, pressure).",
+    "Engineering: Design formulas involve variables for dimensions, material properties, and loads.",
+    "Cooking: Recipes can be scaled using variables to represent ingredient quantities for different serving sizes."
+  ],
+  "tags": [
+    "algebra",
+    "foundational",
+    "symbolism",
+    "equations"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "id": "quadratics",
+  "title": "Quadratic Equations",
+  "difficulty": 3,
+  "description": "A quadratic equation is a second-degree polynomial equation in a single variable x, with the standard form ax² + bx + c = 0, where 'a', 'b', and 'c' are coefficients (real numbers) and 'a' is not equal to zero. The solutions to a quadratic equation are called its roots or zeros, which are the x-values where the corresponding quadratic function y = ax² + bx + c intersects the x-axis. Quadratic equations graph as parabolas.",
+  "key_ideas": [
+    "Standard Form: ax² + bx + c = 0 (where a ≠ 0).",
+    "Coefficients: 'a' (leading coefficient), 'b' (linear coefficient), 'c' (constant term).",
+    "Roots/Zeros: The values of x that satisfy the equation. A quadratic equation can have two distinct real roots, one repeated real root, or two complex conjugate roots.",
+    "Parabola: The U-shaped graph of a quadratic function. The parabola opens upwards if a > 0 and downwards if a < 0.",
+    "Vertex: The highest or lowest point of the parabola.",
+    "Axis of Symmetry: A vertical line that divides the parabola into two mirror images, passing through the vertex. Equation: x = -b/(2a).",
+    "Discriminant (Δ): The part of the quadratic formula under the square root, Δ = b² - 4ac. It determines the nature of the roots:",
+    "  - If Δ > 0: Two distinct real roots.",
+    "  - If Δ = 0: One repeated real root (or two equal real roots).",
+    "  - If Δ < 0: Two complex conjugate roots (no real roots)."
+  ],
+  "methods_for_solving": [
+    {
+      "name": "Factoring",
+      "description": "Rewrite the quadratic expression as a product of two linear factors and use the zero product property. Applicable when the quadratic is easily factorable.",
+      "example_problem": "Solve x² - 5x + 6 = 0",
+      "solution": "Factor: (x - 2)(x - 3) = 0. So, x - 2 = 0 or x - 3 = 0. Roots: x = 2, x = 3."
+    },
+    {
+      "name": "Quadratic Formula",
+      "description": "A general formula that solves for x in any quadratic equation: x = [-b ± √(b² - 4ac)] / 2a. Always works.",
+      "example_problem": "Solve 2x² + 3x - 5 = 0",
+      "solution": "Here a=2, b=3, c=-5. Plug into formula: x = [-3 ± √(3² - 4*2*(-5))] / (2*2) = [-3 ± √(9 + 40)] / 4 = [-3 ± √49] / 4 = [-3 ± 7] / 4. Roots: x₁ = (-3+7)/4 = 4/4 = 1, and x₂ = (-3-7)/4 = -10/4 = -2.5."
+    },
+    {
+      "name": "Completing the Square",
+      "description": "Manipulate the equation to form a perfect square trinomial on one side. Useful for deriving the quadratic formula and for converting quadratics to vertex form.",
+      "example_problem": "Solve x² + 6x - 7 = 0 by completing the square.",
+      "solution_steps": [
+        "Move constant term: x² + 6x = 7.",
+        "Take half of the coefficient of x and square it: (6/2)² = 3² = 9.",
+        "Add this to both sides: x² + 6x + 9 = 7 + 9.",
+        "Factor the perfect square trinomial: (x + 3)² = 16.",
+        "Take the square root of both sides: x + 3 = ±√16 = ±4.",
+        "Solve for x: x = -3 ± 4. Roots: x₁ = -3 + 4 = 1, x₂ = -3 - 4 = -7."
+      ]
+    },
+    {
+      "name": "Square Root Property",
+      "description": "If x² = k, then x = ±√k. Useful for equations of the form ax² + c = 0 (where b=0).",
+      "example_problem": "Solve 3x² - 27 = 0",
+      "solution": "3x² = 27 => x² = 9 => x = ±√9. Roots: x = 3, x = -3."
+    }
+  ],
+  "examples": [
+    {
+      "method": "Using the Discriminant",
+      "problem": "Determine the nature of roots for x² - 4x + 4 = 0",
+      "solution_steps": [
+        "Identify a=1, b=-4, c=4.",
+        "Calculate Discriminant Δ = b² - 4ac = (-4)² - 4(1)(4) = 16 - 16 = 0.",
+        "Since Δ = 0, there is one repeated real root."
+      ],
+      "nature_of_roots": "One repeated real root."
+    }
+  ],
+  "common_misconceptions": [
+    "Errors in applying the quadratic formula, especially with signs or order of operations.",
+    "Forgetting the '±' when taking the square root, leading to only one solution.",
+    "Mistakes in factoring, particularly when the leading coefficient 'a' is not 1.",
+    "Incorrectly interpreting the discriminant (e.g., confusing no real roots with no solutions at all)."
+  ],
+  "real_world_applications": [
+    "Physics: Calculating projectile motion (height, range, time of flight).",
+    "Engineering: Designing bridges, arches, and other structures.",
+    "Optimization: Finding maximum or minimum values (e.g., maximum profit, minimum cost).",
+    "Geometry: Problems involving areas of shapes that lead to quadratic equations."
+  ],
+  "prerequisites": ["Understanding of linear equations", "Factoring basic polynomials (trinomials)", "Operations with square roots", "Algebraic manipulation"]
+}

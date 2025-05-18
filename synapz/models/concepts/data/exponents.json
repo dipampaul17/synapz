@@ -1,0 +1,93 @@
+{
+  "id": "exponents",
+  "title": "Exponents and Logarithms",
+  "difficulty": 4,
+  "description": "Exponents indicate how many times a base number is multiplied by itself. For example, in b\u207f, 'b' is the base and 'n' is the exponent. Logarithms are the inverse operation of exponentiation. The logarithm of a number 'x' to a base 'b' (written as log\u2098(x)) is the exponent to which 'b' must be raised to produce 'x'. They are crucial for solving exponential equations and analyzing phenomena with exponential growth or decay.",
+  "key_ideas": {
+    "exponents": [
+      "Base: The number being multiplied.",
+      "Exponent (or Power/Index): The number of times the base is multiplied by itself.",
+      "Exponential Form: b\u207f (e.g., 2\u00b3).",
+      "Expanded Form: b * b * ... * b (n times) (e.g., 2 * 2 * 2)."
+    ],
+    "logarithms": [
+      "Logarithmic Form: y = log\u2098(x) is equivalent to Exponential Form: x = b\u02b8.",
+      "Base of Logarithm: The 'b' in log\u2098(x). Common bases are 10 (common logarithm, log) and 'e' (natural logarithm, ln).",
+      "Argument of Logarithm: The 'x' in log\u2098(x), which must be positive."
+    ]
+  },
+  "properties_of_exponents": [
+    "Product Rule: b\u1d50 * b\u207f = b\u1d50\u207a\u207f (e.g., 2\u00b3 * 2\u00b2 = 2\u2075)",
+    "Quotient Rule: b\u1d50 / b\u207f = b\u1d50\u207b\u207f (e.g., 2\u2075 / 2\u00b2 = 2\u00b3)",
+    "Power Rule: (b\u1d50)\u207f = b\u1d50\u207f (e.g., (2\u00b2)\u00b3 = 2\u2076)",
+    "Power of a Product Rule: (ab)\u207f = a\u207fb\u207f (e.g., (2*3)\u00b2 = 2\u00b2 * 3\u00b2)",
+    "Power of a Quotient Rule: (a/b)\u207f = a\u207f/b\u207f (e.g., (2/3)\u00b2 = 2\u00b2/3\u00b2)",
+    "Zero Exponent: b\u2070 = 1 (for b \u2260 0) (e.g., 5\u2070 = 1)",
+    "Negative Exponent: b\u207b\u207f = 1/b\u207f (e.g., 2\u207b\u00b3 = 1/2\u00b3 = 1/8)",
+    "Fractional Exponent (Roots): b^(m/n) = \u207f\u221a(b\u1d50) (e.g., 8^(2/3) = \u00b3\u221a(8\u00b2) = \u00b3\u221a64 = 4)"
+  ],
+  "properties_of_logarithms": [
+    "Product Rule: log\u2098(xy) = log\u2098(x) + log\u2098(y) (e.g., log\u2082(4*8) = log\u2082(4) + log\u2082(8) = 2 + 3 = 5)",
+    "Quotient Rule: log\u2098(x/y) = log\u2098(x) - log\u2098(y) (e.g., log\u2082(16/2) = log\u2082(16) - log\u2082(2) = 4 - 1 = 3)",
+    "Power Rule: log\u2098(x\u207f) = n * log\u2098(x) (e.g., log\u2082(4\u00b3) = 3 * log\u2082(4) = 3 * 2 = 6)",
+    "Change of Base Formula: log\u2098(x) = log\u209c(x) / log\u209c(b) (e.g., log\u2082(100) = log\u2081\u2080(100) / log\u2081\u2080(2) = 2 / 0.30103 \u2248 6.64)",
+    "log\u2098(b) = 1 (e.g., log\u2082(2) = 1)",
+    "log\u2098(1) = 0 (e.g., log\u2082(1) = 0)"
+  ],
+  "examples": [
+    {
+      "type": "Basic Exponentiation",
+      "problem": "Calculate 3\u2074",
+      "solution": "3\u2074 = 3 * 3 * 3 * 3 = 81",
+      "explanation": "The base 3 is multiplied by itself 4 times."
+    },
+    {
+      "type": "Basic Logarithm",
+      "problem": "Find log\u2082(8)",
+      "solution": "We need to find the power to which 2 must be raised to get 8. Since 2\u00b3 = 8, log\u2082(8) = 3.",
+      "explanation": "Logarithms ask 'what exponent gives me this number?'"
+    },
+    {
+      "type": "Solving Exponential Equation with Logarithms",
+      "problem": "Solve for x: 2\u02e3 = 16",
+      "solution_steps": [
+        "Take the logarithm of both sides (base 2 is convenient here): log\u2082(2\u02e3) = log\u2082(16)",
+        "Using the power rule for logarithms (log\u2098(x\u207f) = n * log\u2098(x)): x * log\u2082(2) = log\u2082(16)",
+        "Since log\u2082(2) = 1 and log\u2082(16) = 4 (because 2\u2074 = 16): x * 1 = 4",
+        "x = 4"
+      ],
+      "explanation": "Logarithms are used to bring the variable down from the exponent."
+    },
+    {
+      "type": "Using Exponent Properties (Product Rule)",
+      "problem": "Simplify: (5x\u00b3y\u00b2)(2x\u2074y)",
+      "solution_steps": [
+        "Group coefficients and like variables: (5*2) * (x\u00b3*x\u2074) * (y\u00b2*y\u00b9)",
+        "Multiply coefficients: 10",
+        "Apply product rule for exponents (add exponents): x^(3+4) = x\u2077 and y^(2+1) = y\u00b3",
+        "Result: 10x\u2077y\u00b3"
+      ],
+      "explanation": "When multiplying terms with the same base, add their exponents."
+    }
+  ],
+  "common_misconceptions": [
+    "Confusing x\u207f with n*x (e.g., 2\u00b3 is 8, not 6).",
+    "Incorrectly applying exponent rules, especially with negative or fractional exponents.",
+    "Thinking log(x+y) = log(x) + log(y) (this is incorrect; the product rule is log(xy) = log(x) + log(y)).",
+    "The logarithm of a negative number or zero is undefined in real numbers.",
+    "Forgetting the base of a logarithm (common log is base 10, natural log is base e)."
+  ],
+  "real_world_applications": [
+    "Compound interest calculations (exponential growth).",
+    "Radioactive decay modeling (exponential decay).",
+    "Measuring earthquake intensity (Richter scale - logarithmic).",
+    "Measuring sound intensity (decibels - logarithmic).",
+    "Population growth models.",
+    "Computer algorithm complexity (e.g., O(log n), O(n\u00b2))."
+  ],
+  "prerequisites": [
+    "Understanding of multiplication and division",
+    "Basic algebra (variables, expressions)",
+    "Understanding of inverse operations"
+  ]
+}

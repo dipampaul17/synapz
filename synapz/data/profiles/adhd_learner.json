@@ -1,0 +1,68 @@
+{
+  "id": "adhd_learner",
+  "name": "Sam (ADHD Profile)",
+  "cognitive_style": "adhd",
+  "description": "Sam is a learner with ADHD characteristics, including a dynamic attention span, a preference for engaging and varied content, and strengths in creative thinking.",
+  "attention_profile": {
+    "typical_span": "Varies; can hyperfocus on engaging topics, otherwise short to moderate for less stimulating content.",
+    "triggers_for_focus": ["Novelty", "High interest", "Interactive elements", "Clear goals", "Sense of urgency"],
+    "distraction_factors": ["Monotony", "Lengthy text blocks", "Lack of clear structure", "Passive learning"]
+  },
+  "working_memory": "May experience challenges with holding and manipulating multiple pieces of information simultaneously, especially if presented verbally or in dense text.",
+  "executive_functions": {
+    "planning_organization": "Benefits from structured outlines, checklists, and clear, sequential steps. May struggle with self-organizing complex tasks.",
+    "task_initiation": "May delay starting tasks that seem overwhelming or uninteresting. Clear starting points and immediate engagement are helpful.",
+    "emotional_regulation": "May be sensitive to frustration; positive reinforcement and celebrating small wins are beneficial."
+  },
+  "processing_style": "Often processes information in a non-linear, divergent manner. Strong in pattern recognition and making novel connections. May find rigid, purely sequential presentations challenging.",
+  "learning_preferences": [
+    "Interactive exercises and simulations",
+    "Visually stimulating materials (color, diagrams, varied formatting)",
+    "Chunked information (short paragraphs, bullet points)",
+    "Real-world examples and practical applications",
+    "Gamified elements or challenges",
+    "Clear and immediate feedback",
+    "Opportunities for movement or physical interaction (if applicable)"
+  ],
+  "communication_needs": {
+    "instruction_delivery": "Prefers clear, concise language. Benefits from information presented in multiple modalities (visual + auditory cues). Direct and explicit instructions are better than subtle or implied ones.",
+    "feedback_reception": "Responds well to specific, constructive feedback that is delivered in a supportive tone. Appreciates acknowledgment of effort."
+  },
+  "strengths": [
+    "High creativity and innovative thinking",
+    "Strong problem-solving skills, especially with novel challenges",
+    "Ability to hyperfocus on areas of interest",
+    "Good at seeing the 'big picture' or making connections others might miss",
+    "Energetic and enthusiastic when engaged"
+  ],
+  "challenges": [
+    "Sustained attention on tasks perceived as low-interest or repetitive",
+    "Organization and time management",
+    "Following multi-step directions without visual aids or reminders",
+    "Impulse control (may lead to jumping to conclusions or interrupting)",
+    "Working memory overload with too much information at once"
+  ],
+  "motivation_triggers": [
+    "Novelty and variety in content and presentation",
+    "Topics aligned with personal interests",
+    "Clear relevance of the material to real-life situations",
+    "Sense of accomplishment and progress (frequent, small wins)",
+    "Positive and enthusiastic teaching style"
+  ],
+  "effective_teaching_strategies": [
+    "Use of visual aids, color-coding, and varied formatting.",
+    "Breaking down complex information into smaller, manageable chunks.",
+    "Incorporating interactive elements and frequent opportunities for engagement.",
+    "Providing concrete examples and analogies, especially those related to the learner's interests.",
+    "Offering choices in how to learn or demonstrate understanding when possible.",
+    "Frequent check-ins for comprehension and engagement.",
+    "Using timers or visual schedules to help with task management.",
+    "Positive reinforcement and encouragement."
+  ],
+  "assessment_needs": [
+    "Prefers varied assessment methods over long, traditional tests.",
+    "May perform better with project-based assessments or practical demonstrations.",
+    "Benefits from clear rubrics and expectations for assessments.",
+    "May need accommodations like extended time or a quiet environment for formal assessments."
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "id": "equations",
+  "title": "Linear Equations",
+  "difficulty": 2,
+  "description": "A linear equation is a fundamental concept in algebra representing a statement that two linear expressions are equal. A linear expression involves variables to the first power (e.g., x, not x\u00b2). Solving a linear equation means finding the specific value(s) for the variable(s) that make the statement true. These equations typically graph as straight lines when plotted on a coordinate plane (e.g., y = mx + c).",
+  "key_ideas": [
+    "Equality: The core principle is that both sides of the equation must always remain equal.",
+    "Inverse Operations: To isolate the variable, apply inverse operations (addition/subtraction, multiplication/division) to both sides of the equation.",
+    "Order of Operations (PEMDAS/BODMAS): Applied in reverse when solving (SADMEP/SAMDOB).",
+    "One Variable vs. Two Variables: Linear equations can involve one variable (e.g., 3x + 1 = 7) or two variables (e.g., y = 2x - 1), the latter often representing lines."
+  ],
+  "examples": [
+    {
+      "type": "One-step equation (addition/subtraction)",
+      "problem": "x + 5 = 12",
+      "solution_steps": [
+        "To isolate x, subtract 5 from both sides.",
+        "x + 5 - 5 = 12 - 5",
+        "x = 7"
+      ],
+      "explanation": "The value that makes the statement true is 7."
+    },
+    {
+      "type": "One-step equation (multiplication/division)",
+      "problem": "4a = 20",
+      "solution_steps": [
+        "To isolate a, divide both sides by 4.",
+        "4a / 4 = 20 / 4",
+        "a = 5"
+      ],
+      "explanation": "The value that makes the statement true is 5."
+    },
+    {
+      "type": "Two-step equation",
+      "problem": "3x + 1 = 7",
+      "solution_steps": [
+        "First, subtract 1 from both sides (inverse of addition).",
+        "3x + 1 - 1 = 7 - 1",
+        "3x = 6",
+        "Next, divide both sides by 3 (inverse of multiplication).",
+        "3x / 3 = 6 / 3",
+        "x = 2"
+      ],
+      "explanation": "The solution requires two steps to isolate x."
+    },
+    {
+      "type": "Variable on both sides",
+      "problem": "5y - 8 = 2y + 7",
+      "solution_steps": [
+        "Collect variable terms on one side. Subtract 2y from both sides:",
+        "5y - 2y - 8 = 2y - 2y + 7",
+        "3y - 8 = 7",
+        "Collect constant terms on the other side. Add 8 to both sides:",
+        "3y - 8 + 8 = 7 + 8",
+        "3y = 15",
+        "Isolate y. Divide both sides by 3:",
+        "3y / 3 = 15 / 3",
+        "y = 5"
+      ],
+      "explanation": "Systematically isolate the variable by moving terms."
+    },
+    {
+      "type": "Equation with fractions",
+      "problem": "x/2 + 1/3 = 5/6",
+      "solution_steps": [
+        "Find the least common multiple (LCM) of the denominators (2, 3, 6), which is 6.",
+        "Multiply every term by the LCM to eliminate fractions: 6 * (x/2) + 6 * (1/3) = 6 * (5/6)",
+        "3x + 2 = 5",
+        "Solve the resulting linear equation: Subtract 2 from both sides.",
+        "3x = 3",
+        "Divide by 3.",
+        "x = 1"
+      ],
+      "explanation": "Eliminating fractions can simplify solving the equation."
+    }
+  ],
+  "common_misconceptions": [
+    "Forgetting to perform the same operation on both sides of the equation.",
+    "Sign errors when moving terms across the equals sign (e.g., not changing addition to subtraction).",
+    "Incorrectly applying the distributive property when parentheses are involved.",
+    "Errors in arithmetic, especially with negative numbers or fractions."
+  ],
+  "real_world_applications": [
+    "Calculating costs, profits, and break-even points in business.",
+    "Converting temperatures between Celsius and Fahrenheit.",
+    "Solving for unknown quantities in physics (e.g., distance, speed, time).",
+    "Budgeting and financial planning."
+  ],
+  "prerequisites": [
+    "Understanding of basic arithmetic operations",
+    "Concept of variables and constants",
+    "Familiarity with order of operations"
+  ]
+}

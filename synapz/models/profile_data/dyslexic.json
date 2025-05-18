@@ -1,0 +1,71 @@
+{
+  "id": "dyslexic",
+  "name": "Taylor (Dyslexic Profile)",
+  "cognitive_style": "dyslexic",
+  "description": "Taylor is a learner with dyslexia, characterized by challenges in phonological processing and working memory for text, but strong in conceptual understanding and visual-spatial reasoning.",
+  "phonological_processing": "Experiences difficulty with decoding individual words, sound-symbol correspondence, and reading fluency. Spelling can also be a challenge.",
+  "working_memory": "May have limitations in holding and processing text-based information in working memory, but conceptual working memory can be strong.",
+  "reading_profile": {
+    "reading_speed": "Typically slower than peers, requires more effort for decoding.",
+    "comprehension": "Often strong when barriers to decoding are removed (e.g., via audio support, accessible text formats). May struggle if cognitive load from decoding is too high.",
+    "preferred_formats": [
+      "Text with good spacing (increased line height, paragraph spacing)",
+      "Sans-serif fonts (e.g., Arial, Verdana)",
+      "Larger font sizes (12-14pt or higher)",
+      "Option for text-to-speech"
+    ]
+  },
+  "processing_style": "Excels at big-picture thinking, making connections between concepts, and understanding complex systems. Strong visual-spatial reasoning and narrative reasoning.",
+  "learning_preferences": [
+    "Auditory learning (podcasts, audio explanations, text-to-speech)",
+    "Visual aids (diagrams, mind maps, flowcharts, videos)",
+    "Experiential and hands-on learning",
+    "Structured and well-organized content with clear headings and summaries",
+    "Multi-sensory approaches (combining visual, auditory, kinesthetic)",
+    "Spaced repetition for memorization of facts or vocabulary"
+  ],
+  "communication_needs": {
+    "instruction_delivery": "Benefits from clear, direct language. Avoid jargon or provide immediate definitions. Instructions given verbally and visually are helpful.",
+    "written_expression": "May find it challenging to express complex ideas in writing due to spelling or sentence construction difficulties. May benefit from using speech-to-text tools or alternative formats for showing understanding."
+  },
+  "strengths": [
+    "Strong conceptual understanding and holistic thinking",
+    "Excellent problem-solving and reasoning skills",
+    "Creativity and out-of-the-box thinking",
+    "Strong verbal communication skills (when not focused on decoding written text)",
+    "Visual-spatial abilities and pattern recognition",
+    "Empathy and strong interpersonal skills"
+  ],
+  "challenges": [
+    "Decoding text fluently and accurately",
+    "Spelling and written expression",
+    "Rapid naming and phonological awareness",
+    "Working memory for text-based information",
+    "Organization of written work without explicit structure",
+    "Time management for reading-intensive tasks"
+  ],
+  "motivation_triggers": [
+    "Understanding the 'why' behind what is being learned (relevance)",
+    "Content that leverages visual or conceptual strengths",
+    "Feeling understood and supported in their learning process",
+    "Opportunities to demonstrate understanding in varied ways (not just written tests)",
+    "Achievable goals and recognition of effort and progress"
+  ],
+  "effective_teaching_strategies": [
+    "Providing audio versions of text materials.",
+    "Using dyslexia-friendly fonts and formatting (sans-serif, good spacing, clear headings).",
+    "Breaking down information into smaller, manageable chunks with visual cues.",
+    "Explicitly teaching vocabulary and concepts, pre-teaching if necessary.",
+    "Using mind maps, graphic organizers, and diagrams to show relationships.",
+    "Allowing for alternative methods of demonstrating knowledge (oral reports, projects).",
+    "Providing ample time for reading and written tasks.",
+    "Focusing on understanding and ideas over perfect spelling/grammar in drafts."
+  ],
+  "assessment_needs": [
+    "Benefits from oral assessments or presentations.",
+    "Requires clear, uncluttered test formats with dyslexia-friendly fonts.",
+    "Extended time for reading and writing components of tests.",
+    "Use of assistive technology (text-to-speech, speech-to-text) where appropriate.",
+    "Assessment of conceptual understanding rather than solely on mechanics of writing/spelling."
+  ]
+}

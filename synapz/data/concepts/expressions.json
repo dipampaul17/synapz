@@ -1,0 +1,75 @@
+{
+  "id": "expressions",
+  "title": "Algebraic Expressions",
+  "difficulty": 1,
+  "description": "An algebraic expression is a mathematical phrase that combines numbers (constants), variables (letters representing unknown values), and operational symbols (+, -, ×, ÷, exponents). Unlike an equation, an algebraic expression does not contain an equals sign and therefore cannot be 'solved' for a specific value of the variable (though it can be evaluated if the variable's value is known, or simplified). Expressions are the building blocks of equations and inequalities.",
+  "key_ideas": [
+    "Variable: A symbol (usually a letter like x, y, or a) that represents an unknown quantity or a quantity that can change.",
+    "Constant: A fixed numerical value (e.g., 5, -2, π).",
+    "Term: A single number, a variable, or numbers and variables multiplied together. Terms are separated by + or - signs (e.g., in 3x + 2y - 5, the terms are 3x, 2y, and -5).",
+    "Coefficient: The numerical factor of a term that contains a variable (e.g., in 3x, the coefficient is 3).",
+    "Like Terms: Terms that have the exact same variable(s) raised to the exact same power(s) (e.g., 3x² and -5x² are like terms, but 3x and 3x² are not).",
+    "Simplifying Expressions: Combining like terms to make the expression shorter and easier to understand.",
+    "Evaluating Expressions: Substituting a specific value for each variable and calculating the result."
+  ],
+  "types_of_expressions": [
+    "Monomial: An expression with only one term (e.g., 5x, 7, -2ab²).",
+    "Binomial: An expression with two terms (e.g., 3x + 2, a² - b²).",
+    "Trinomial: An expression with three terms (e.g., x² + 5x + 6, 2a - 3b + c).",
+    "Polynomial: An expression with one or more terms, where exponents on variables are non-negative integers."
+  ],
+  "examples": [
+    {
+      "type": "Identifying parts of an expression",
+      "expression_string": "4x² - 7y + 2x² + 5",
+      "parts": {
+        "terms": ["4x²", "-7y", "2x²", "5"],
+        "variables": ["x", "y"],
+        "constants": ["5"],
+        "coefficients": {"x²": ["4", "2"], "y": "-7"}
+      }
+    },
+    {
+      "type": "Evaluating an expression",
+      "expression_string": "3a + 2b - 1",
+      "given_values": {"a": 4, "b": -2},
+      "solution_steps": [
+        "Substitute the given values: 3(4) + 2(-2) - 1",
+        "Perform multiplication: 12 - 4 - 1",
+        "Perform addition/subtraction from left to right: 8 - 1 = 7"
+      ],
+      "result": 7
+    },
+    {
+      "type": "Simplifying an expression (combining like terms)",
+      "expression_string": "5x + 3y - 2x + 7y - 4",
+      "solution_steps": [
+        "Identify like terms: (5x and -2x), (3y and 7y), (-4).",
+        "Combine like terms: (5x - 2x) + (3y + 7y) - 4",
+        "Result: 3x + 10y - 4"
+      ],
+      "simplified_expression": "3x + 10y - 4"
+    },
+    {
+      "type": "Using the distributive property",
+      "expression_string": "3(2a - 5b)",
+      "solution_steps": [
+        "Multiply the term outside the parentheses by each term inside: 3 * 2a - 3 * 5b",
+        "Result: 6a - 15b"
+      ],
+      "simplified_expression": "6a - 15b"
+    }
+  ],
+  "common_misconceptions": [
+    "Confusing expressions with equations (trying to 'solve' an expression).",
+    "Incorrectly combining unlike terms (e.g., adding 3x and 2y to get 5xy).",
+    "Errors with signs, especially when subtracting terms or distributing a negative sign.",
+    "Mistakes in the order of operations when evaluating."
+  ],
+  "real_world_applications": [
+    "Representing unknown quantities in word problems.",
+    "Formulas in science, engineering, and finance (e.g., Area = length × width is built from expressions).",
+    "Calculating costs based on variable inputs (e.g., cost = $0.50 × number_of_items + $5.00 fixed_fee)."
+  ],
+  "prerequisites": ["Understanding of basic arithmetic operations (addition, subtraction, multiplication, division)", "Familiarity with the concept of a variable (as a placeholder)"]
+}

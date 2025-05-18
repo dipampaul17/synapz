@@ -1,0 +1,89 @@
+{
+  "id": "functions",
+  "title": "Functions and Relations",
+  "difficulty": 4,
+  "description": "A relation is a set of ordered pairs (x, y), showing a relationship between two sets of values. A function is a special type of relation where every input value (x, from the domain) is associated with exactly one output value (y, from the range). Functions are fundamental to mathematics and are used to model real-world phenomena where one quantity depends on another.",
+  "key_ideas": [
+    "Relation: Any set of ordered pairs. Can be represented by a set of points, a table, a graph, or a mapping diagram.",
+    "Function: A relation where each input (x-value) has only one unique output (y-value). Passes the Vertical Line Test (a vertical line drawn on the graph intersects the function at most once).",
+    "Domain: The set of all possible input values (x-values) for which the function is defined.",
+    "Range: The set of all possible output values (y-values) that the function can produce.",
+    "Function Notation: f(x), read as \"f of x\", represents the output of function 'f' for a given input 'x'. 'x' is the independent variable, and f(x) (or y) is the dependent variable.",
+    "Independent Variable: The input to a function, usually denoted by x.",
+    "Dependent Variable: The output of a function, usually denoted by y or f(x), as its value depends on the input."
+  ],
+  "representations_of_functions": [
+    "Set of Ordered Pairs: e.g., {(1, 2), (2, 4), (3, 6)}",
+    "Table of Values: Columns for x and y (or f(x)).",
+    "Equation: e.g., f(x) = 2x + 1 or y = x\u00b2.",
+    "Graph: A visual plot of the ordered pairs on a coordinate plane.",
+    "Mapping Diagram: Shows arrows from domain elements to range elements."
+  ],
+  "types_of_functions_overview": [
+    "Linear Functions: f(x) = mx + c (graph as a straight line).",
+    "Quadratic Functions: f(x) = ax\u00b2 + bx + c (graph as a parabola).",
+    "Polynomial Functions: General form f(x) = a\u2099x\u207f + ... + a\u2081x + a\u2080.",
+    "Exponential Functions: f(x) = ab\u02e3 (model growth/decay).",
+    "Logarithmic Functions: f(x) = log\u2098(x) (inverse of exponential).",
+    "Trigonometric Functions: e.g., f(x) = sin(x), f(x) = cos(x) (model periodic phenomena)."
+  ],
+  "examples": [
+    {
+      "type": "Identifying a function from ordered pairs",
+      "relation1": {
+        "pairs": "{(1,a), (2,b), (3,c)}",
+        "is_function": true,
+        "reason": "Each input has exactly one output."
+      },
+      "relation2": {
+        "pairs": "{(1,a), (1,b), (2,c)}",
+        "is_function": false,
+        "reason": "The input 1 has two different outputs (a and b)."
+      }
+    },
+    {
+      "type": "Evaluating a function",
+      "function_equation": "f(x) = 3x\u00b2 - 2x + 5",
+      "problem": "Find f(-2)",
+      "solution_steps": [
+        "Substitute x = -2 into the function: f(-2) = 3(-2)\u00b2 - 2(-2) + 5",
+        "Calculate powers: f(-2) = 3(4) - 2(-2) + 5",
+        "Perform multiplications: f(-2) = 12 + 4 + 5",
+        "Perform additions: f(-2) = 21"
+      ],
+      "result": "f(-2) = 21"
+    },
+    {
+      "type": "Determining Domain and Range from a simple function",
+      "function_equation": "y = \u221a(x - 3)",
+      "domain_reasoning": "The expression under the square root (radicand) must be non-negative. So, x - 3 \u2265 0, which means x \u2265 3.",
+      "domain": "[3, \u221e)",
+      "range_reasoning": "The square root function \u221a produces non-negative values. So, y \u2265 0.",
+      "range": "[0, \u221e)"
+    },
+    {
+      "type": "Vertical Line Test",
+      "description": "A graph represents a function if and only if no vertical line intersects the graph at more than one point.",
+      "example_graph_is_function": "A parabola opening upwards or downwards (e.g., y=x\u00b2).",
+      "example_graph_not_function": "A circle (e.g., x\u00b2 + y\u00b2 = 9) or a sideways parabola (e.g., x=y\u00b2)."
+    }
+  ],
+  "common_misconceptions": [
+    "Confusing functions with general relations.",
+    "Thinking all equations represent functions (e.g., x\u00b2 + y\u00b2 = r\u00b2 is a circle, not a function of x).",
+    "Incorrectly identifying domain and range, especially with square roots or denominators.",
+    "Errors in function notation, e.g., treating f(x) as f multiplied by x.",
+    "Mistakes in applying the vertical line test."
+  ],
+  "real_world_applications": [
+    "Modeling physical phenomena: trajectory of a projectile, growth of populations, decay of radioactive substances.",
+    "Economics: supply and demand curves, cost functions, revenue functions.",
+    "Computer Science: algorithms often represent functions transforming input to output.",
+    "Engineering: designing structures, analyzing circuits, signal processing."
+  ],
+  "prerequisites": [
+    "Understanding of ordered pairs and coordinate graphing",
+    "Algebraic expressions and solving equations",
+    "Concept of variables"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "control",
+  "name": "Standard Learner (Control)",
+  "cognitive_traits": {
+    "attention_span": "typical",
+    "processing_style": "balanced",
+    "working_memory": "average capacity",
+    "strengths": [
+      "general comprehension",
+      "standard information processing"
+    ],
+    "challenges": []
+  },
+  "modality_preferences": {
+    "primary": [
+      "mixed"
+    ],
+    "secondary": [],
+    "avoid": []
+  },
+  "pedagogical_needs": {
+    "chunk_size": "standard",
+    "organization": "typical academic structure",
+    "engagement": "standard educational approaches",
+    "optimal_explanation_length": "comprehensive",
+    "example_types": [
+      "typical examples"
+    ]
+  }
+}
