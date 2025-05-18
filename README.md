@@ -105,62 +105,57 @@ the simulation process leverages multiple evaluation mechanisms:
 ## 📊 current evidence (batch_run_20250518_091436)
 
 <div align="center">
+  <h4>Adaptive vs Control Win Rate (latest batch)</h4>
+  <div align="center">
+    <table>
+      <tr>
+        <th>Win Type</th>
+        <th>Percentage</th>
+      </tr>
+      <tr>
+        <td>Adaptive Wins</td>
+        <td>40%</td>
+      </tr>
+      <tr>
+        <td>Control Wins</td>
+        <td>46.7%</td>
+      </tr>
+      <tr>
+        <td>Ties</td>
+        <td>13.3%</td>
+      </tr>
+    </table>
+  </div>
+  
+  <!-- Attempting to display the win rate chart using a direct raw GitHub URL -->
+  <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="450" alt="Adaptive vs Control Win Rate Chart">
+
+  <h4>Profile-Specific Results</h4>
   <table>
-    <tr>
-      <td>
-        <h4>Adaptive vs Control Win Rate (latest batch)</h4>
-        <div align="center">
-          <table>
-            <tr>
-              <th>Win Type</th>
-              <th>Percentage</th>
-            </tr>
-            <tr>
-              <td>Adaptive Wins</td>
-              <td>40%</td>
-            </tr>
-            <tr>
-              <td>Control Wins</td>
-              <td>46.7%</td>
-            </tr>
-            <tr>
-              <td>Ties</td>
-              <td>13.3%</td>
-            </tr>
-          </table>
-        </div>
-        <img src="results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="350" alt="Win Rate">
-      </td>
-      <td>
-        <h4>Profile-Specific Results</h4>
-        <table>
-          <thead>
-            <tr>
-              <th>profile</th>
-              <th>adaptive win %</th>
-              <th>avg clarity</th>
-              <th>p-value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>dyslexic</td>
-              <td>33.33%</td>
-              <td>4.00 vs 2.33</td>
-              <td>0.038*</td>
-            </tr>
-            <tr>
-              <td>visual</td>
-              <td>50.00%</td>
-              <td>2.50 vs 3.00</td>
-              <td>0.500</td>
-            </tr>
-          </tbody>
-        </table>
-        <em>* small sample size caution</em>
-      </td>
-    </tr>
+    <thead>
+      <tr>
+        <th>profile</th>
+        <th>adaptive win %</th>
+        <th>avg clarity</th>
+        <th>p-value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>dyslexic</td>
+        <td>33.33%</td>
+        <td>4.00 vs 2.33</td>
+        <td>0.038*</td>
+      </tr>
+      <tr>
+        <td>visual</td>
+        <td>50.00%</td>
+        <td>2.50 vs 3.00</td>
+        <td>0.500</td>
+      </tr>
+    </tbody>
   </table>
+  <em>* small sample size caution</em>
 </div>
 
 > ⚠️ **truth check:** our latest runs show **weak evidence** for the core thesis with only a 40% win rate for adaptive teaching across all profiles. we need more data and refined approaches for definitive conclusions.
