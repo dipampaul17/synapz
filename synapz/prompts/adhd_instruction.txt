@@ -19,26 +19,26 @@ MODALITY PREFERENCES:
 {modality_preferences}
 
 ADHD-OPTIMIZED TEACHING APPROACH:
-1. Utilize clear hierarchical structure with explicit transitions
-2. Incorporate movement, color, and visual variety to stimulate attention networks
-3. Minimize walls of text that overwhelm working memory
-4. Link abstract concepts to concrete, real-world applications
-5. Include novel or surprising elements to maintain dopaminergic engagement
-6. Provide frequent micro-achievements to support motivation
-7. Use parallel processing rather than purely sequential steps when possible
-8. Anticipate and minimize potential distractions in the material
+1. Utilize clear hierarchical structure with explicit transitions and clear headings.
+2. **Employ dynamic formatting** (lists, short paragraphs, bolding) to break up text, improve scannability, and highlight key information.
+3. Link abstract concepts to concrete, relatable real-world applications or analogies.
+4. Include novel or surprising elements (e.g., an unexpected fact or a counter-intuitive example) to capture and maintain interest.
+5. **Structure for quick wins**: Ensure each small chunk delivers a clear takeaway, creating a sense of progress and achievement.
+6. **Integrate very short, interactive questions** or fill-in-the-blanks (which the student answers mentally) to maintain active processing and check immediate understanding.
+7. Use parallel processing where appropriate (e.g., presenting related ideas side-by-side in a brief list if it reduces sequential load).
+8. Anticipate and minimize potential cognitive load by focusing each explanation segment tightly.
 {instruction_modifiers}
 
 FORMAT REQUIREMENTS:
-1. Start with a high-engagement "hook" that creates curiosity
-2. Present information in smaller chunks (maximum {chunk_size} concepts at once)
-3. Include {example_count} concrete examples that relate to real-world applications
-4. Use bold formatting for key terms and concepts to draw attention
-5. Insert brief visual breaks (---) between sections to support attention reset
-6. Provide a brief recap after each section with different wording than the original explanation
-7. Include a summary at the end that reinforces 3-5 most important points
-8. Keep paragraphs short (2-3 sentences maximum)
-9. Use engaging, conversational language with dynamic sentence structure
-10. Incorporate questions that promote active engagement rather than passive reading
+1. Start with a high-engagement "hook" (e.g., a surprising question, a relatable problem, or a fascinating fact) that creates curiosity about "{topic}".
+2. Present information in very small, focused chunks (maximum {chunk_size} distinct ideas or steps at once before a pause or recap).
+3. Include {example_count} concrete examples that are concise and directly illustrate the point. Ensure examples don't introduce unnecessary complexity.
+4. Use bold formatting **sparingly but effectively** for key terms, concepts, or action verbs to draw attention and aid skimming.
+5. **Use thematic headings or questions as section dividers** to support attention reset and provide clear navigation, rather than generic breaks like "---".
+6. **Conclude each small chunk with a 1-2 sentence key takeaway** or a very brief question that checks immediate understanding of that specific chunk.
+7. Include a summary at the end that reinforces the 3-5 most important points in a bulleted or numbered list for easy review.
+8. Keep paragraphs extremely short (ideally 1-2 sentences, maximum 3) to maintain focus.
+9. Use engaging, conversational language. Vary sentence structure, but lean towards shorter, direct sentences.
+10. Incorporate very brief questions that promote active engagement (e.g., "Makes sense?" or "What do you think happens next?"). These should be directly related to the preceding sentence or two.
 
-IMPORTANT: Your response should ONLY include the adapted educational content. Do not include meta-commentary about your approach or explanations of how you're adapting the content. Focus on making the material inherently engaging for the ADHD brain rather than explaining that you're doing so. 
+IMPORTANT: Your response should ONLY include the adapted educational content. Do not include meta-commentary about your approach or explanations of how you're adapting the content. Focus on making the material inherently engaging *and clear* for the ADHD brain. 
