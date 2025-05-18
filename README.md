@@ -129,8 +129,8 @@ the simulation process leverages multiple evaluation mechanisms:
             </tr>
           </table>
         </div>
-        <!-- Attempting to display the win rate chart using a direct raw GitHub URL with Markdown syntax inside HTML -->
-        ![Adaptive vs Control Win Rate Chart](https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/evidence_summary.png)
+        <!-- Using HTML img tag directly within the table cell -->
+        <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="350" alt="Adaptive vs Control Win Rate Chart">
       </td>
       <td>
         <h4>Profile-Specific Results</h4>
