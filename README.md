@@ -1,4 +1,4 @@
-# synapz
+# synapz ⚡️
 
 <div align="center">
   <img src=".github/synapz_logo.svg" alt="Synapz Logo" width="180"/>
@@ -165,7 +165,7 @@ the simulation process leverages multiple evaluation mechanisms:
 
 > ⚠️ **truth check:** our latest runs show **weak evidence** for the core thesis with only a 40% win rate for adaptive teaching across all profiles. we need more data and refined approaches for definitive conclusions.
 
-### key visualizations from batch runs
+### 📊 key visualizations from batch runs
 
 <div align="center">
   <p>
