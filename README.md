@@ -169,13 +169,13 @@ the simulation process leverages multiple evaluation mechanisms:
 
 <div align="center">
   <p>
-    <img src="results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="400" alt="Adaptive vs Control Win Rate Chart">
+    <img src="./results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="400" alt="Adaptive vs Control Win Rate Chart">
   </p>
   <p>
-    <img src="results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="400" alt="Effect Sizes Chart">
+    <img src="./results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="400" alt="Effect Sizes Chart">
   </p>
   <p>
-    <img src="results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="400" alt="Readability Metrics Chart">
+    <img src="./results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="400" alt="Readability Metrics Chart">
   </p>
 </div>
 
