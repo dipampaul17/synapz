@@ -1,94 +1,112 @@
-# Synapz - Database and System Prompts
+# core module
 
-This module contains the core functionality for the Synapz adaptive learning system.
+> central components of the synapz adaptive learning system
 
-## Recent Additions
+## module contents
 
-### Database Schema
+the `synapz` module contains the core functionality for creating adaptive learning experiences:
 
-The `synapz.core.models.Database` class implements a SQLite database with WAL journaling for concurrent access. It includes tables for:
+### key components
 
-- Learner profiles
-- Concepts
-- Teaching sessions
-- Interactions
-- Experiment metrics
+- 🧠 **`core/`**: core engine components
+  - `adapter.py`: content adaptation for cognitive profiles
+  - `api_client.py`: communication with external systems
+  - `budget.py`: budget tracking and enforcement
+  - `llm_client.py`: llm interaction with error handling
+  - `models.py`: database schema and access
+  - `profiles.py`: cognitive profile definitions
+  - `simulator.py`: student feedback simulation
+  - `teacher.py`: adaptive teaching agent
 
-Example usage:
+- 📊 **`data/`**: data management and metrics
+  - `metrics.py`: learning effectiveness measurement
+  - `analysis.py`: statistical analysis for adaptation
+  - `visualization.py`: results visualization
+  - `storage.py`: data persistence
+  - `/concepts`: educational concept definitions
+  - `/profiles`: cognitive profile definitions
+
+- 📋 **`evaluate.py`**: batch experiment system for comparing adaptive vs control teaching
+
+## database schema
+
+the system uses sqlite with wal journaling for concurrent access, with tables for:
+
+- learner profiles
+- concepts
+- teaching sessions
+- interactions
+- experiment metrics
 
 ```python
-from synapz.core import Database
-from synapz.data import (
-    create_unified_experiment_from_concept,
-    store_initial_interaction
-)
+# example of core functionality
+from synapz.core.models import Database
+from synapz.core.teacher import TeacherAgent
+from synapz.core.llm_client import LLMClient
+from synapz.core.budget import BudgetTracker
 
-# Initialize the database
+# initialize components
 db = Database()
+budget = BudgetTracker(db_path="synapz.db", max_budget=5.0)
+llm_client = LLMClient(budget_tracker=budget)
+teacher = TeacherAgent(llm_client=llm_client, db=db)
 
-# Create a teaching session
-session_id, control_id = create_unified_experiment_from_concept(
-    db=db,
-    concept_id="variables", 
-    learner_profile_id="adhd",
-    experiment_type="adaptive",
-    with_control=True
+# create a teaching session
+session_id = teacher.create_session(
+    learner_id="dyslexic_learner", 
+    concept_id="equations",
+    is_adaptive=True
 )
 
-# Log an interaction
-interaction_id = store_initial_interaction(
-    db=db,
-    session_id=session_id,
-    content="Teaching content here...",
-    teaching_strategy="visual",
-    pedagogy_tags=["visual", "example-driven"],
-    tokens_in=100,
-    tokens_out=250
-)
-
-# Get history for a session
-history = db.get_session_history(session_id)
+# generate adaptive explanation
+result = teacher.generate_explanation(session_id)
 ```
 
-### System Prompts
+## system prompts
 
-The system includes two types of prompts:
+the system uses two types of prompts for experiments:
 
-1. **Adaptive System Prompt** (`synapz/prompts/adaptive_system.txt`)
-   - Tailors teaching to different cognitive profiles
-   - Adapts based on clarity ratings and previous interactions
-   - Returns structured JSON responses
+1. **adaptive system prompt** (`prompts/adaptive_system.txt`)
+   - tailors teaching to different cognitive profiles
+   - adapts based on feedback and learning patterns
+   - structured for scientific comparison
 
-2. **Control System Prompt** (`synapz/prompts/control_system.txt`)
-   - Provides consistent teaching regardless of feedback
-   - Used as a baseline for comparison
-   - Returns the same JSON structure as adaptive prompts
-
-To use these prompts:
+2. **control system prompt** (`prompts/control_system.txt`)
+   - provides consistent teaching regardless of profile
+   - serves as scientific baseline for comparison
+   - uses identical output structure as adaptive prompts
 
 ```python
-from synapz.core import ContentAdapter
-from synapz.models.concepts import load_concept
-from synapz.models.learner_profiles import get_profile_for_adaptation
+# loading prompts example
+from pathlib import Path
+from synapz import PROMPTS_DIR
 
-# Get a concept and profile
-concept = load_concept("variables")
-profile = get_profile_for_adaptation("adhd")
-
-# Get the appropriate prompt
-adapter = ContentAdapter(api_client, profile_manager, PROMPTS_DIR)
-prompt = adapter.get_system_prompt(
-    experiment_type="adaptive",
-    concept=concept,
-    profile=profile,
-    context={
-        "turn_number": 1,
-        "previous_clarity": None,
-        "interaction_history": []
-    }
+# adaptive prompt has full context of learner profile
+with open(PROMPTS_DIR / "adaptive_system.txt", "r") as f:
+    adaptive_prompt = f.read()
+    
+# formatted with learner profile, concept data, and interaction history
+formatted_prompt = adaptive_prompt.format(
+    learner_profile_json="...",
+    concept_json="...",
+    turn_number=1,
+    previous_clarity="None",
+    interaction_history=""
 )
 ```
 
-## Integration with Existing Components
+## integration with other components
 
-The `synapz.data.integration` module provides utilities to ensure the new Database class works seamlessly with the existing ExperimentStorage class. 
+the `synapz.data.integration` module provides utilities for compatibility between components:
+
+```python
+from synapz.core.models import Database
+from synapz.data.integration import (
+    export_experiment_metrics,
+    import_legacy_data
+)
+
+# example of integrating with existing analysis tools
+db = Database()
+metrics_data = export_experiment_metrics(db, experiment_id="exp-123")
+```

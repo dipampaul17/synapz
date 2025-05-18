@@ -1,44 +1,41 @@
-# Synapz Examples
+# examples
 
-This directory contains example scripts demonstrating how to use the Synapz library components.
+> demonstration scripts for synapz library components
 
-## LLM Client Example
+## overview
 
-The `llm_client_example.py` script demonstrates how to use the new `LLMClient` class for OpenAI API interactions with:
+this directory contains example scripts showing how to use various synapz components:
 
-1. Budget enforcement
-2. Automatic retries with exponential backoff
-3. Token tracking
-4. Pre-call cost projection
-5. Structured JSON output
-6. Embedding generation
+- `llm_client_example.py`: demonstrates the `LLMClient` class with budget tracking
+- `teacher_example.py`: shows how to use the `TeacherAgent` for adaptive teaching
+- `simple_eval_example.py`: provides a minimal example of evaluation metrics
 
-### API Key Management
+## key features demonstrated
 
-The example uses python-dotenv to securely manage your OpenAI API key:
+- ⚙️ budget enforcement with pre-call cost projection
+- 🔄 automatic retries with exponential backoff
+- 📊 token usage tracking
+- 🧠 adaptive teaching based on cognitive profiles
+- 📝 structured json output handling
 
-1. When you first run the example, it will create a `.env` file at the project root
-2. The `.env` file is excluded from version control via `.gitignore`
-3. The API key is loaded from the environment, not hardcoded in source files
-
-If you want to use a different API key, simply edit the `.env` file.
-
-### Running the Example
+## running examples
 
 ```bash
-# Install required dependencies
-pip install -r requirements.txt
+# ensure environment is set up
+export OPENAI_API_KEY='your-api-key-here'
+# or use a .env file at project root
 
-# Run the example
+# run an example
 python -m synapz.examples.llm_client_example
 ```
 
-The example will demonstrate:
-- Basic text completion
-- JSON-formatted completion
-- Embedding generation
-- Budget tracking
+## api key management
 
-## Disclaimer
+the examples use environment variables to manage your openai api key:
 
-These examples may incur charges to your OpenAI account. The example script sets a small budget limit ($1) to prevent excessive spending. 
+```python
+# example of secure api key handling
+api_key = os.environ.get("OPENAI_API_KEY")
+```
+
+❗ **note**: examples may incur charges to your openai account. each example sets a small budget limit to prevent excessive spending. 
