@@ -44,15 +44,18 @@ class BudgetTracker:
     }
     
     def __init__(self, db_path: str, max_budget: float = 20.0):
-        """Initialize with SQLite connection and budget ceiling."""
+        """Initialize with SQLite connection and budget ceiling for the current run."""
         self.db_path = db_path
-        self.max_budget = max_budget
-        self.total_cost = 0.0
+        self.run_budget_allowance = max_budget  # Renamed from max_budget
         self._setup_db()
         
-        # Load current spend from database
-        self.total_cost = self.get_current_spend()
-        logger.info(f"Budget tracker initialized with current spend: ${self.total_cost:.4f}")
+        # Store the total spend recorded in the DB at the beginning of this tracker's lifecycle
+        self.initial_total_spend_at_run_start = self._get_db_total_spend()
+        
+        # total_cost will track spend *during this run* initially, but get_current_spend will always refer to DB total
+        self.current_run_spend = 0.0 
+        
+        logger.info(f"Budget tracker initialized. Run allowance: ${self.run_budget_allowance:.2f}. Initial total historical spend: ${self.initial_total_spend_at_run_start:.4f}")
     
     def _setup_db(self) -> None:
         """Set up SQLite database with WAL journaling for concurrent access."""
@@ -115,17 +118,18 @@ class BudgetTracker:
         return cost
     
     def check_budget(self, projected_cost: float) -> bool:
-        """Check if projected cost fits within remaining budget."""
-        current_total = self.get_current_spend()
+        """Check if projected cost fits within remaining budget for this run."""
+        current_total_historical_spend = self._get_db_total_spend()
+        current_spend_this_run = current_total_historical_spend - self.initial_total_spend_at_run_start
         
-        # Update internal tracker
-        self.total_cost = current_total
-        
-        # Would this call exceed our budget?
-        return (current_total + projected_cost) < self.max_budget
+        # Allow spending if run_budget_allowance is 0 (effectively infinite for this run)
+        if self.run_budget_allowance == 0:
+            return True
+            
+        return (current_spend_this_run + projected_cost) <= self.run_budget_allowance
     
     def log_usage(self, model: str, tokens_in: int, tokens_out: int) -> None:
-        """Log token usage to SQLite and update running total."""
+        """Log token usage to SQLite and update running total for this run."""
         rates = self.get_model_rates(model)
         cost = (tokens_in * rates["input"] + tokens_out * rates["output"]) / 1_000_000
         
@@ -138,11 +142,16 @@ class BudgetTracker:
         conn.commit()
         conn.close()
         
-        self.total_cost += cost
-        logger.info(f"Logged usage: {model}, {tokens_in} in, {tokens_out} out, ${cost:.6f}, total: ${self.total_cost:.4f}")
+        self.current_run_spend += cost # Tracks spend for current instance lifecycle
+        total_historical_spend = self._get_db_total_spend() # Should reflect the new entry
+        logger.info(f"Logged usage: {model}, {tokens_in} in, {tokens_out} out, ${cost:.6f}. Spend this run: ${self.current_run_spend:.4f}. Total historical: ${total_historical_spend:.4f}")
         
     def get_current_spend(self) -> float:
-        """Get current total spend from database."""
+        """Get current total historical spend from database. For run-specific spend, use get_current_run_spend()."""
+        return self._get_db_total_spend()
+
+    def _get_db_total_spend(self) -> float:
+        """Helper to exclusively get total spend from DB."""
         try:
             conn = sqlite3.connect(self.db_path)
             cur = conn.cursor()
@@ -151,14 +160,27 @@ class BudgetTracker:
             conn.close()
             return result[0] if result[0] is not None else 0.0
         except Exception as e:
-            logger.error(f"Error retrieving current spend: {str(e)}")
-            return self.total_cost  # Fallback to in-memory tracker
-    
+            logger.error(f"Error retrieving total spend from DB: {str(e)}")
+            # Fallback to a high number to be safe if DB fails, or handle more gracefully
+            return float('inf') 
+
+    def get_current_run_spend(self) -> float:
+        """Get the spend accumulated during the current run/instance of BudgetTracker."""
+        # Recalculate based on current DB total and initial start
+        current_total_db_spend = self._get_db_total_spend()
+        return current_total_db_spend - self.initial_total_spend_at_run_start
+
+    def get_remaining_run_budget(self) -> float:
+        """Get the remaining budget for the current run."""
+        if self.run_budget_allowance == 0: # Effectively infinite
+            return float('inf')
+        return self.run_budget_allowance - self.get_current_run_spend()
+
     def is_exceeded(self) -> bool:
-        """Check if the total cost has met or exceeded the max budget."""
-        # Ensure total_cost is up-to-date with the database
-        self.total_cost = self.get_current_spend()
-        return self.total_cost >= self.max_budget
+        """Check if the current run's spend has met or exceeded its allowance."""
+        if self.run_budget_allowance == 0: # Infinite budget for this run
+            return False
+        return self.get_current_run_spend() >= self.run_budget_allowance
 
     def get_usage_summary(self) -> Dict[str, Any]:
         """Get a summary of token usage by model."""
@@ -196,19 +218,27 @@ class BudgetTracker:
             
             conn.close()
             
+            current_run_spend_val = self.get_current_run_spend()
+            remaining_run_budget_val = self.get_remaining_run_budget()
+
             return {
-                "total_tokens_in": total[0] if total[0] else 0,
-                "total_tokens_out": total[1] if total[1] else 0,
-                "total_cost": total[2] if total[2] else 0.0,
-                "total_calls": total[3] if total[3] else 0,
-                "remaining_budget": self.max_budget - (total[2] if total[2] else 0.0),
+                "total_historical_tokens_in": total[0] if total[0] else 0,
+                "total_historical_tokens_out": total[1] if total[1] else 0,
+                "total_historical_cost": total[2] if total[2] else 0.0,
+                "total_historical_calls": total[3] if total[3] else 0,
+                "current_run_spend": current_run_spend_val,
+                "run_budget_allowance": self.run_budget_allowance,
+                "remaining_run_budget": remaining_run_budget_val,
                 "by_model": models_usage
             }
             
         except Exception as e:
             logger.error(f"Error generating usage summary: {str(e)}")
+            current_run_spend_val = self.get_current_run_spend()
             return {
-                "total_cost": self.total_cost,
-                "remaining_budget": self.max_budget - self.total_cost,
+                "total_historical_cost": self._get_db_total_spend(), # Still show historical
+                "current_run_spend": current_run_spend_val,
+                "run_budget_allowance": self.run_budget_allowance,
+                "remaining_run_budget": self.get_remaining_run_budget(),
                 "error": str(e)
             } 

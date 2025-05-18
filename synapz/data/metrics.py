@@ -18,6 +18,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import difflib # For Gestalt Pattern Matching
 from synapz.core.models import Database # Added for MetricsCalculator
 import uuid # Added for MetricsCalculator
+from collections import defaultdict
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -439,6 +440,119 @@ class MetricsCalculator:
             costs.append(interaction.get('cost', 0.0) or 0.0)
         total_cost = sum(costs)
         return total_cost
+
+    def _get_turn_by_turn_clarity_for_sessions(self, session_ids: List[str]) -> Dict[str, List[Optional[int]]]:
+        """
+        Fetches turn-by-turn clarity scores for a list of session IDs.
+
+        Args:
+            session_ids: A list of session IDs to process.
+
+        Returns:
+            A dictionary mapping each session ID to a list of clarity scores,
+            ordered by turn number. Scores can be None if not recorded.
+        """
+        sessions_clarity_data: Dict[str, List[Optional[int]]] = {}
+        for session_id in session_ids:
+            interactions = self.db.get_session_history(session_id) # Already sorted by turn
+            clarity_for_session: List[Optional[int]] = []
+            if not interactions:
+                logger.warning(f"No interactions found for session_id: {session_id} in _get_turn_by_turn_clarity_for_sessions")
+            for i_idx, interaction in enumerate(interactions):
+                if not isinstance(interaction, dict):
+                    logger.error(f"Interaction item is not a dict in _get_turn_by_turn_clarity_for_sessions! Session ID: {session_id}, Index: {i_idx}, Type: {type(interaction)}")
+                    clarity_for_session.append(None) # Append None if interaction data is malformed
+                    continue
+                
+                clarity_score_raw = interaction.get("clarity_score")
+                if clarity_score_raw is not None:
+                    try:
+                        clarity_for_session.append(int(clarity_score_raw))
+                    except (ValueError, TypeError):
+                        logger.error(f"Could not parse clarity_score '{clarity_score_raw}' to int for session {session_id}, turn {interaction.get('turn_number', i_idx + 1)}. Storing as None.")
+                        clarity_for_session.append(None)
+                else:
+                    clarity_for_session.append(None) # Clarity not recorded for this turn
+            sessions_clarity_data[session_id] = clarity_for_session
+        return sessions_clarity_data
+
+    def aggregate_turn_clarity_by_profile_and_type(
+        self, 
+        experiment_pair_results: List[Dict[str, Any]],
+        all_profiles_data: Dict[str, Dict[str, Any]] # Pass all_profiles_data to get cognitive_style
+    ) -> Dict[str, Dict[str, Dict[int, List[float]]]]:
+        """
+        Aggregates turn-by-turn clarity scores, grouped by learner profile's cognitive_style 
+        and experiment type (adaptive/control).
+
+        Args:
+            experiment_pair_results: List of dicts, where each dict contains info about an experiment pair,
+                                     including 'learner_id', 'adaptive_session_id', 'control_session_id'.
+            all_profiles_data: Dict mapping learner_id to their full profile data, to fetch cognitive_style.
+
+        Returns:
+            A nested dictionary:
+            { 
+                'profile_cognitive_style': {
+                    'adaptive': {turn_number: [clarity_scores_for_this_turn_adaptive], ...},
+                    'control': {turn_number: [clarity_scores_for_this_turn_control], ...}
+                },
+                ...
+            }
+            Clarity scores are floats (or will be converted). Turns are 1-indexed.
+        """
+        aggregated_data: Dict[str, Dict[str, Dict[int, List[float]]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+
+        session_ids_to_fetch = []
+        session_id_to_info_map = {}
+
+        for pair_result in experiment_pair_results:
+            learner_id = pair_result.get("learner_id")
+            adaptive_session_id = pair_result.get("adaptive_session_id")
+            control_session_id = pair_result.get("control_session_id")
+
+            if not learner_id:
+                logger.warning(f"Skipping pair result due to missing learner_id: {pair_result}")
+                continue
+            
+            profile_data = all_profiles_data.get(learner_id)
+            if not profile_data:
+                logger.warning(f"Skipping learner_id {learner_id} as profile data not found.")
+                continue
+            
+            cognitive_style = profile_data.get("cognitive_style", "unknown_style")
+
+            if adaptive_session_id:
+                session_ids_to_fetch.append(adaptive_session_id)
+                session_id_to_info_map[adaptive_session_id] = {"profile_style": cognitive_style, "type": "adaptive"}
+            if control_session_id:
+                session_ids_to_fetch.append(control_session_id)
+                session_id_to_info_map[control_session_id] = {"profile_style": cognitive_style, "type": "control"}
+
+        if not session_ids_to_fetch:
+            return {}
+            
+        # Fetch all turn-by-turn clarity data in one go
+        all_sessions_clarity = self._get_turn_by_turn_clarity_for_sessions(list(set(session_ids_to_fetch)))
+
+        for session_id, clarity_scores in all_sessions_clarity.items():
+            info = session_id_to_info_map.get(session_id)
+            if not info:
+                logger.warning(f"No info found for session_id {session_id} in map. Skipping.")
+                continue
+
+            profile_style = info["profile_style"]
+            session_type = info["type"]
+
+            for turn_idx, score in enumerate(clarity_scores):
+                turn_number = turn_idx + 1 # 1-indexed turns
+                if score is not None:
+                    try:
+                        aggregated_data[profile_style][session_type][turn_number].append(float(score))
+                    except (ValueError, TypeError):
+                         logger.error(f"Could not convert score '{score}' to float for session {session_id}, turn {turn_number}. Skipping score.")
+        
+        return aggregated_data
 
     def _calculate_comprehensive_clarity_stats(self, session_id: str) -> Dict[str, Any]:
         """Calculate comprehensive clarity statistics for a session."""

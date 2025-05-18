@@ -8,14 +8,17 @@ You have just been presented with an explanation of a concept.
 LEARNING MATERIAL:
 {explanation_text}
 
-HEURISTIC ASSESSMENT OF THE MATERIAL (scores 0.0 to 1.0, higher is better):
+SUMMARY HEURISTIC ASSESSMENT OF THE MATERIAL:
 - Readability Score (e.g., Flesch-Kincaid): {readability_score} (Lower indicates easier to read)
 - Sentence Complexity Score: {sentence_complexity_score} (Lower indicates less complex)
 - Vocabulary Richness Score: {vocabulary_richness_score} (Lower indicates simpler vocabulary)
 - Abstractness Score: {abstractness_score} (Lower indicates more concrete language)
-- Profile Match Score (how well the text matches your profile's preferences heuristically): {profile_match_score}
+- Profile Match Score (overall heuristic fit for your profile, 0.0 to 1.0, higher is better): {profile_match_score}
 
-Based on your cognitive profile, the learning material, AND the heuristic assessment provided above, please evaluate the explanation.
+DETAILED HEURISTIC BREAKDOWN:
+{heuristic_breakdown}
+
+Based on your cognitive profile, the learning material, AND ALL THE HEURISTIC ASSESSMENTS provided above (both summary and detailed breakdown), please evaluate the explanation.
 
 AUTHENTIC SIMULATION GUIDELINES:
 
@@ -54,24 +57,24 @@ Rate clarity and engagement from 1-5 where:
 4. Generally well-adapted/engaging with minor areas for improvement.
 5: Perfectly tailored, optimal for my learning and engagement.
 
-Respond in JSON format. Be specific, constructive, and always relate your feedback to your cognitive profile.
+Respond in JSON format. Be specific, constructive, and always relate your feedback to your cognitive profile and the provided heuristic data.
 
 {{
   "clarity_rating": <Integer from 1-5>,
   "engagement_rating": <Integer from 1-5>,
-  "detailed_feedback": "<Your overall experience. How did the material make you feel as a student with your profile? Did the heuristic scores align with your experience?>",
+  "detailed_feedback": "<Your overall experience. How did the material make you feel as a student with your profile? Specifically comment on how your experience aligns with or differs from BOTH the summary heuristic scores AND the detailed heuristic breakdown. For instance, if the profile match score is high but you still struggled, explain why from your profile's perspective, referencing specific points from the detailed breakdown if relevant.>",
   "confusion_points": [
-    "<Specific element 1 that hindered understanding/engagement, and WHY from your profile's perspective.>",
+    "<Specific element 1 that hindered understanding/engagement, and WHY from your profile's perspective, potentially informed by the heuristic data.>",
     "<Specific element 2...>"
   ],
   "helpful_elements": [
-    "<Specific element 1 that aided understanding/engagement, and WHY from your profile's perspective.>",
+    "<Specific element 1 that aided understanding/engagement, and WHY from your profile's perspective, potentially informed by the heuristic data.>",
     "<Specific element 2...>"
   ],
   "improvement_suggestions": [
-    "<Suggestion 1 for how this material could be better adapted to YOUR cognitive profile.>",
+    "<Suggestion 1 for how this material could be better adapted to YOUR cognitive profile, considering both your experience and the heuristic data.>",
     "<Suggestion 2...>"
   ]
 }}
 
-IMPORTANT: Your response must precisely reflect how the explanation meets or fails to meet YOUR specific cognitive needs. Connect your feedback directly to the characteristics in your profile and the heuristic data. Your insights are crucial for proving adaptive learning works!
+IMPORTANT: Your response must precisely reflect how the explanation meets or fails to meet YOUR specific cognitive needs. Connect your feedback directly to the characteristics in your profile AND THE FULL HEURISTIC DATA (summary scores and detailed breakdown). Your insights are crucial for proving adaptive learning works!

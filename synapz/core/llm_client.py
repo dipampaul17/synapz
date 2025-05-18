@@ -107,11 +107,14 @@ class LLMClient:
         # Project cost before API call
         projected_cost = self.budget_tracker.project_cost(full_prompt, max_tokens, model)
         
-        # Check if we'd exceed budget
-        if not self.budget_tracker.check_budget(projected_cost):
-            raise ValueError(f"Budget limit reached! Projected cost of {projected_cost:.4f} "
-                             f"would exceed the remaining budget of "
-                             f"${self.budget_tracker.max_budget - self.budget_tracker.get_current_spend():.4f}")
+        # Check if we'd exceed budget for the current run
+        if self.budget_tracker.run_budget_allowance > 0 and \
+           not self.budget_tracker.check_budget(projected_cost):
+            remaining_run_budget = self.budget_tracker.get_remaining_run_budget()
+            raise ValueError(f"Budget limit for this run reached! Projected cost of ${projected_cost:.4f} "
+                             f"would exceed the remaining run budget of ${remaining_run_budget:.4f}. "
+                             f"(Run allowance: ${self.budget_tracker.run_budget_allowance:.2f}, "
+                             f"Spend this run so far: ${self.budget_tracker.get_current_run_spend():.4f})" )
         
         # Try to get completion with retries
         attempts = 0

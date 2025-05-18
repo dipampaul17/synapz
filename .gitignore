@@ -173,6 +173,7 @@ cython_debug/
 results/
 !results/batch_run_*/visualizations/*.png
 viz_prod_batch_run/
+viz/
 
 # SQLite specific
 *.db

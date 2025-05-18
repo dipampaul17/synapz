@@ -31,9 +31,10 @@ from synapz.data.metrics import (
     extract_pedagogy_tags, 
     calculate_statistical_significance,
     NumpyEncoder, # Ensure NumpyEncoder is imported
-    MetricsCalculator # Import MetricsCalculator
+    MetricsCalculator, # Import MetricsCalculator
 )
 from synapz import DATA_DIR
+from synapz.data.visualization import create_visualization_from_report
 
 #from synapz.test_harness import run_simulated_test_session # Assuming test_harness.py is not ready or its functionality is integrated
 
@@ -59,7 +60,8 @@ def _run_one_session(
     use_llm_simulator: bool,
     turns_per_session: int,
     is_adaptive_session: bool, 
-    concept_id: str 
+    concept_id: str,
+    budget_tracker: BudgetTracker
 ) -> Tuple[List[Dict[str, Any]], float]: 
     """
     Run a single teaching session (either adaptive or control) and log details.
@@ -156,6 +158,46 @@ def _run_one_session(
                 clarity_to_record = 0.0
 
             teacher.record_feedback(explanation_result["interaction_id"], int(round(float(clarity_to_record))))
+
+            # Create a summary table for the turn
+            turn_summary_table = Table(box=box.MINIMAL, show_header=False, padding=(0,1,0,0))
+            turn_summary_table.add_column("Metric", style="dim italic")
+            turn_summary_table.add_column("Value", style="bold")
+
+            turn_summary_table.add_row("Turn", f"{turn}/{turns_per_session}")
+            llm_clarity = sim_result.get('clarity_rating', 'N/A')
+            turn_summary_table.add_row("LLM Clarity", f"{llm_clarity}/5" if llm_clarity != 'N/A' else "N/A")
+            
+            engagement = sim_result.get('engagement_rating', 'N/A')
+            turn_summary_table.add_row("Engagement", f"{engagement}/5" if engagement != 'N/A' else "N/A")
+
+            final_clarity_to_display = sim_result.get('final_clarity_score', clarity_to_record) # Use the recorded clarity
+            turn_summary_table.add_row("Final Clarity (Recorded)", f"{final_clarity_to_display:.2f}/5" if isinstance(final_clarity_to_display, (int, float)) else "N/A")
+            
+            profile_match = sim_result.get('heuristic_profile_match_score')
+            turn_summary_table.add_row("Heuristic Profile Match", f"{profile_match:.2f}" if profile_match is not None else "N/A")
+
+            turn_summary_table.add_row("---", "---") # Separator
+
+            # Budget details
+            run_allowance = budget_tracker.run_budget_allowance
+            spend_this_run = budget_tracker.get_current_run_spend()
+            remaining_run_budget = budget_tracker.get_remaining_run_budget()
+            
+            turn_summary_table.add_row("Run Budget Allowance", f"${run_allowance:.2f}")
+            turn_summary_table.add_row("Spent This Run", f"${spend_this_run:.4f}")
+            
+            if remaining_run_budget >= 0:
+                turn_summary_table.add_row("Remaining for Run", f"[green]${remaining_run_budget:.2f}[/green]")
+            else:
+                turn_summary_table.add_row("Remaining for Run", f"[bold red]${remaining_run_budget:.2f} (EXCEEDED by ${abs(remaining_run_budget):.2f})[/bold red]")
+
+            console.print(Panel(
+                turn_summary_table,
+                title=f"📊 Turn {turn} Summary & Budget",
+                border_style="cyan",
+                padding=(1,1)
+            ))
 
         except Exception as e:
             logger.error(f"Error during turn {turn} in session {session_id} ({session_type_str.lower()}): {e}", exc_info=True)
@@ -292,17 +334,19 @@ def run_batch_experiment(
             console.print(Panel(f"[bold]🧪 Experiment Pair {i+1}/{len(combinations_to_run)}: Learner [u]{learner_name}[/u] | Concept [u]{concept_title}[/u][/bold]", border_style="magenta", expand=False, padding=(0,1)))
 
             adaptive_session_id = teacher.create_session(learner_id, concept_id, is_adaptive=True)
-            _, adaptive_cost = _run_one_session(
+            adaptive_feedback_log, adaptive_cost = _run_one_session(
                 session_id=adaptive_session_id, teacher=teacher, simulator=simulator, 
                 learner_profile=learner_profile, console=console, use_llm_simulator=use_llm_simulator, 
-                turns_per_session=turns_per_session, is_adaptive_session=True, concept_id=concept_title
+                turns_per_session=turns_per_session, is_adaptive_session=True, concept_id=concept_title,
+                budget_tracker=budget_tracker
             )
 
             control_session_id = teacher.create_session(learner_id, concept_id, is_adaptive=False)
-            _, control_cost = _run_one_session(
+            control_feedback_log, control_cost = _run_one_session(
                 session_id=control_session_id, teacher=teacher, simulator=simulator, 
                 learner_profile=learner_profile, console=console, use_llm_simulator=use_llm_simulator, 
-                turns_per_session=turns_per_session, is_adaptive_session=False, concept_id=concept_title
+                turns_per_session=turns_per_session, is_adaptive_session=False, concept_id=concept_title,
+                budget_tracker=budget_tracker
             )
             
             metrics_pair_id = "N/A"
@@ -321,6 +365,16 @@ def run_batch_experiment(
             adaptive_clarity_stats = metrics_calculator._calculate_comprehensive_clarity_stats(adaptive_session_id)
             control_clarity_stats = metrics_calculator._calculate_comprehensive_clarity_stats(control_session_id)
 
+            # Extract final turn heuristic metrics for abstractness
+            final_adaptive_heuristics = adaptive_feedback_log[-1].get("heuristic_metrics_detail", {}) if adaptive_feedback_log else {}
+            final_control_heuristics = control_feedback_log[-1].get("heuristic_metrics_detail", {}) if control_feedback_log else {}
+            
+            adaptive_abstractness_norm = final_adaptive_heuristics.get("abstractness_fkg_normalized")
+            control_abstractness_norm = final_control_heuristics.get("abstractness_fkg_normalized")
+            adaptive_abstractness_raw = final_adaptive_heuristics.get("abstractness_fkg_raw")
+            control_abstractness_raw = final_control_heuristics.get("abstractness_fkg_raw")
+
+
             pair_summary_table = Table(title=f"Pair {i+1} Results: {learner_name} & {concept_title}", box=box.ROUNDED, show_header=True, row_styles=["","dim"])
             pair_summary_table.add_column("Metric", style="bold")
             pair_summary_table.add_column("Adaptive Session", style="green")
@@ -336,6 +390,9 @@ def run_batch_experiment(
                                        f"{adaptive_clarity_stats.get('absolute_improvement', 'N/A')}", 
                                        f"{control_clarity_stats.get('absolute_improvement', 'N/A')}")
             pair_summary_table.add_row("Session Cost", f"${adaptive_cost:.4f}", f"${control_cost:.4f}")
+            pair_summary_table.add_row("Abstractness (FKG Norm)", 
+                                       f"{adaptive_abstractness_norm:.2f}" if adaptive_abstractness_norm is not None else "N/A",
+                                       f"{control_abstractness_norm:.2f}" if control_abstractness_norm is not None else "N/A")
             
             ped_diff = metrics_calculator.compare_pedagogical_difference(adaptive_session_id, control_session_id)
             if "error" not in ped_diff:
@@ -359,19 +416,40 @@ def run_batch_experiment(
                 "adaptive_cost": adaptive_cost, "control_cost": control_cost,
                 "pedagogical_text_difference": ped_diff.get('text_difference') if "error" not in ped_diff else None,
                 "pedagogical_tag_difference": ped_diff.get('tag_difference') if "error" not in ped_diff else None,
+                "adaptive_abstractness_fkg_raw": adaptive_abstractness_raw,
+                "control_abstractness_fkg_raw": control_abstractness_raw,
+                "adaptive_abstractness_fkg_normalized": adaptive_abstractness_norm,
+                "control_abstractness_fkg_normalized": control_abstractness_norm,
                 "error": ped_diff.get("error") # Store error from ped_diff if any
             })
             
-            current_spend = budget_tracker.get_current_spend()
-            budget_pct = (current_spend / budget_tracker.max_budget) * 100 if budget_tracker.max_budget > 0 else 0
-            console.print(f"💰 [bold]Budget Status:[/bold] ${current_spend:.4f} / ${budget_tracker.max_budget:.2f} ({budget_pct:.1f}%)")
+            current_run_spend = budget_tracker.get_current_run_spend()
+            budget_pct = (current_run_spend / budget_tracker.run_budget_allowance) * 100 if budget_tracker.run_budget_allowance > 0 else 0
+            console.print(f"💰 [bold]Overall Run Budget Status (after pair {i+1}):[/bold] "
+                          f"Allowed: ${budget_tracker.run_budget_allowance:.2f} | "
+                          f"Spent This Run: ${current_run_spend:.4f} | "
+                          f"Remaining: ${budget_tracker.get_remaining_run_budget():.2f} ({budget_pct:.1f}% of allowance used)")
             if budget_tracker.is_exceeded():
                 console.print("[bold red]🚨 BUDGET EXCEEDED! Halting batch evaluation. 🚨[/bold red]")
                 break 
             
             progress.advance(overall_task)
 
-    compiled_results = _compile_batch_results(experiment_pair_results_for_compilation)
+    # Aggregate turn-by-turn clarity data before compiling final results
+    aggregated_turn_clarity_data = {}
+    if experiment_pair_results_for_compilation and all_profiles_data:
+        try:
+            aggregated_turn_clarity_data = metrics_calculator.aggregate_turn_clarity_by_profile_and_type(
+                experiment_pair_results_for_compilation,
+                all_profiles_data
+            )
+            console.print("[green]📊 Aggregated turn-by-turn clarity data successfully.[/green]")
+        except Exception as e_agg_clarity:
+            console.print(f"[bold red]Error aggregating turn-by-turn clarity: {e_agg_clarity}[/bold red]")
+            logger.error(f"Failed to aggregate turn-by-turn clarity: {e_agg_clarity}", exc_info=True)
+            # aggregated_turn_clarity_data will remain empty or partially filled, handled by _compile_batch_results
+
+    compiled_results = _compile_batch_results(experiment_pair_results_for_compilation, aggregated_turn_clarity_data)
     
     console.print(Panel("[bold underline]📊 Overall Batch Experiment Summary 📊[/bold underline]", style="bold blue", expand=False, padding=(1,2)))
     
@@ -391,7 +469,7 @@ def run_batch_experiment(
         "avg_text_difference_vs_control": "Text Difference (Adaptive vs Control)",
         "avg_tag_difference_vs_control": "Tag Difference (Adaptive vs Control)",
         "avg_adaptive_cost": "Session Cost",
-        "avg_control_cost": "Session Cost", # Handled
+        "avg_control_cost": "Session Cost" # Handled
     }
     
     # Metrics to display with adaptive, control, diff, p-value
@@ -399,6 +477,7 @@ def run_batch_experiment(
         "Final Clarity": ("avg_adaptive_final_clarity", "avg_control_final_clarity", "p_value_final_clarity"),
         "Clarity Improvement (Abs)": ("avg_adaptive_clarity_improvement", "avg_control_clarity_improvement", "p_value_clarity_improvement"),
         "Session Cost": ("avg_adaptive_cost", "avg_control_cost", "p_value_cost"),
+        "Abstractness (FKG Norm)": ("avg_adaptive_abstractness_fkg_normalized", "avg_control_abstractness_fkg_normalized", "p_value_abstractness_fkg_normalized"),
     }
     
     avg_metrics_data = compiled_results.get("aggregate_results", {}).get("average_metrics", {})
@@ -486,17 +565,28 @@ def run_batch_experiment(
         except Exception as e_csv:
             console.print(f"[red]Error saving detailed CSV results: {e_csv}[/red]")
 
+    # Generate visualizations from the compiled report
+    visualization_output_dir = results_dir / "visualizations"
+    visualization_output_dir.mkdir(parents=True, exist_ok=True) # Ensure it exists
+    try:
+        console.print(f"\n[bold cyan]🖼️ Generating visualizations...[/bold cyan]")
+        create_visualization_from_report(json_results_path, visualization_output_dir)
+        console.print(f"[bold green]Visualizations generated successfully in {visualization_output_dir}[/bold green]")
+    except Exception as e:
+        console.print(f"[bold red]Error during visualization generation: {e}[/bold red]")
+        logger.error("Error during visualization generation after batch run:", exc_info=True)
 
     return compiled_results
 
-def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]], aggregated_turn_clarity_data: Dict[str, Any]) -> Dict[str, Any]:
     """Compile results from all experiment pairs into a structured report."""
     if not experiment_pair_results:
         return {
             "experiments": [],
             "profile_results": {},
             "aggregate_results": {"error": "No experiment results to compile"},
-            "evidence_summary": {"summary_text": "No experiments run."}
+            "evidence_summary": {"summary_text": "No experiments run."},
+            "turn_by_turn_clarity_aggregation": aggregated_turn_clarity_data or {}
         }
 
     # Initialize structures for aggregated data
@@ -512,7 +602,11 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
         "costs_adaptive": [],
         "costs_control": [],
         "text_differences": [],
-        "tag_differences": []
+        "tag_differences": [],
+        "abstractness_fkg_raw_adaptive": [],
+        "abstractness_fkg_raw_control": [],
+        "abstractness_fkg_normalized_adaptive": [],
+        "abstractness_fkg_normalized_control": []
         # Add other metrics you want to track per profile, e.g., readability
     })
 
@@ -524,6 +618,10 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
     all_control_costs = []
     all_text_differences = []
     all_tag_differences = []
+    all_adaptive_abstractness_fkg_raw = []
+    all_control_abstractness_fkg_raw = []
+    all_adaptive_abstractness_fkg_normalized = []
+    all_control_abstractness_fkg_normalized = []
     
     errors_encountered = 0
     total_adaptive_cost_overall = 0.0
@@ -595,6 +693,25 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
         all_text_differences.append(text_diff)
         all_tag_differences.append(tag_diff)
 
+        # Abstractness metrics
+        abs_fkg_raw_adapt = res.get("adaptive_abstractness_fkg_raw")
+        abs_fkg_raw_ctrl = res.get("control_abstractness_fkg_raw")
+        abs_fkg_norm_adapt = res.get("adaptive_abstractness_fkg_normalized")
+        abs_fkg_norm_ctrl = res.get("control_abstractness_fkg_normalized")
+
+        if abs_fkg_raw_adapt is not None:
+            profile_metrics[profile_id]["abstractness_fkg_raw_adaptive"].append(abs_fkg_raw_adapt)
+            all_adaptive_abstractness_fkg_raw.append(abs_fkg_raw_adapt)
+        if abs_fkg_raw_ctrl is not None:
+            profile_metrics[profile_id]["abstractness_fkg_raw_control"].append(abs_fkg_raw_ctrl)
+            all_control_abstractness_fkg_raw.append(abs_fkg_raw_ctrl)
+        if abs_fkg_norm_adapt is not None:
+            profile_metrics[profile_id]["abstractness_fkg_normalized_adaptive"].append(abs_fkg_norm_adapt)
+            all_adaptive_abstractness_fkg_normalized.append(abs_fkg_norm_adapt)
+        if abs_fkg_norm_ctrl is not None:
+            profile_metrics[profile_id]["abstractness_fkg_normalized_control"].append(abs_fkg_norm_ctrl)
+            all_control_abstractness_fkg_normalized.append(abs_fkg_norm_ctrl)
+
 
     # Calculate averages for each profile
     profile_summary_results = {}
@@ -607,7 +724,10 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
                 "avg_final_adaptive_clarity": 0, "avg_final_control_clarity": 0,
                 "avg_adaptive_cost": 0, "avg_control_cost": 0,
                 "avg_text_difference_vs_control": 0, "avg_tag_difference_vs_control": 0,
-                "p_value_final_clarity": 1.0, "p_value_clarity_improvement": 1.0, "p_value_cost": 1.0
+                "p_value_final_clarity": 1.0, "p_value_clarity_improvement": 1.0, "p_value_cost": 1.0,
+                "avg_adaptive_abstractness_fkg_raw": 0.0, "avg_control_abstractness_fkg_raw": 0.0,
+                "avg_adaptive_abstractness_fkg_normalized": 0.0, "avg_control_abstractness_fkg_normalized": 0.0,
+                "p_value_abstractness_fkg_normalized": 1.0
             }
             continue
 
@@ -626,6 +746,12 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
         cost_p_val = calculate_statistical_significance(
             data["costs_adaptive"], data["costs_control"]
         ).get("p_value", 1.0) if data["costs_adaptive"] and data["costs_control"] else 1.0
+
+        # P-value for abstractness_fkg_normalized for this profile
+        abstractness_fkg_norm_p_val = calculate_statistical_significance(
+            data["abstractness_fkg_normalized_adaptive"], data["abstractness_fkg_normalized_control"]
+        ).get("p_value", 1.0) if data["abstractness_fkg_normalized_adaptive"] and data["abstractness_fkg_normalized_control"] else 1.0
+
             
         profile_summary_results[profile] = {
             "num_experiments": num_pairs,
@@ -638,9 +764,14 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
             "avg_control_cost": np.mean(data["costs_control"]) if data["costs_control"] else 0.0,
             "avg_text_difference_vs_control": np.mean(data["text_differences"]) * 100 if data["text_differences"] else 0,
             "avg_tag_difference_vs_control": np.mean(data["tag_differences"]) * 100 if data["tag_differences"] else 0,
+            "avg_adaptive_abstractness_fkg_raw": np.mean(data["abstractness_fkg_raw_adaptive"]) if data["abstractness_fkg_raw_adaptive"] else 0.0,
+            "avg_control_abstractness_fkg_raw": np.mean(data["abstractness_fkg_raw_control"]) if data["abstractness_fkg_raw_control"] else 0.0,
+            "avg_adaptive_abstractness_fkg_normalized": np.mean(data["abstractness_fkg_normalized_adaptive"]) if data["abstractness_fkg_normalized_adaptive"] else 0.0,
+            "avg_control_abstractness_fkg_normalized": np.mean(data["abstractness_fkg_normalized_control"]) if data["abstractness_fkg_normalized_control"] else 0.0,
             "p_value_final_clarity": final_clarity_p_val,
             "p_value_clarity_improvement": clarity_imp_p_val,
-            "p_value_cost": cost_p_val
+            "p_value_cost": cost_p_val,
+            "p_value_abstractness_fkg_normalized": abstractness_fkg_norm_p_val
         }
     
     num_total_experiments_processed = sum(data["total_pairs"] for data in profile_metrics.values())
@@ -659,6 +790,11 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
         all_adaptive_costs, all_control_costs
     ).get("p_value", 1.0) if all_adaptive_costs and all_control_costs else 1.0
 
+    # Overall p-value for abstractness_fkg_normalized
+    overall_p_abstractness_fkg_normalized = calculate_statistical_significance(
+        all_adaptive_abstractness_fkg_normalized, all_control_abstractness_fkg_normalized
+    ).get("p_value", 1.0) if all_adaptive_abstractness_fkg_normalized and all_control_abstractness_fkg_normalized else 1.0
+
     # Aggregate results for the entire batch
     average_metrics = {
         "avg_adaptive_final_clarity": np.mean(all_final_adaptive_clarity) if all_final_adaptive_clarity else 0.0,
@@ -673,6 +809,11 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
         "avg_text_difference_vs_control": np.mean(all_text_differences) * 100 if all_text_differences else 0.0,
         "avg_tag_difference_vs_control": np.mean(all_tag_differences) * 100 if all_tag_differences else 0.0,
         "overall_adaptive_win_rate": (overall_adaptive_wins_clarity_imp / num_total_experiments_processed) * 100 if num_total_experiments_processed > 0 else 0.0,
+        "avg_adaptive_abstractness_fkg_raw": np.mean(all_adaptive_abstractness_fkg_raw) if all_adaptive_abstractness_fkg_raw else 0.0,
+        "avg_control_abstractness_fkg_raw": np.mean(all_control_abstractness_fkg_raw) if all_control_abstractness_fkg_raw else 0.0,
+        "avg_adaptive_abstractness_fkg_normalized": np.mean(all_adaptive_abstractness_fkg_normalized) if all_adaptive_abstractness_fkg_normalized else 0.0,
+        "avg_control_abstractness_fkg_normalized": np.mean(all_control_abstractness_fkg_normalized) if all_control_abstractness_fkg_normalized else 0.0,
+        "p_value_abstractness_fkg_normalized": overall_p_abstractness_fkg_normalized,
     }
     
     aggregate_results_summary = {
@@ -712,60 +853,96 @@ def _compile_batch_results(experiment_pair_results: List[Dict[str, Any]]) -> Dic
         "experiments": experiment_pair_results, 
         "profile_results": profile_summary_results, 
         "aggregate_results": aggregate_results_summary, 
-        "evidence_summary": evidence_summary 
+        "evidence_summary": evidence_summary,
+        "turn_by_turn_clarity_aggregation": aggregated_turn_clarity_data or {}
     }
 
 def main():
-    parser = argparse.ArgumentParser(description="Run Synapz batch evaluations.")
-    parser.add_argument(
-        "--size", 
-        type=int, 
-        default=3,
-        help="Number of (learner, concept) pairs for batch evaluation"
-    )
-    parser.add_argument(
-        "--turns", 
-        type=int, 
-        default=3, 
-        help="Number of turns per teaching session"
-    )
-    parser.add_argument(
-        "--budget", 
-        type=float, 
-        default=10.0, 
-        help="Max budget in USD for this batch run"
-    )
-    parser.add_argument(
-        "--db-path",
-        type=str,
-        default=str(DATA_DIR / "synapz_eval.db"), # Default path using DATA_DIR from synapz package
-        help="Path to the SQLite database for evaluation results."
-    )
-    parser.add_argument(
-        "--api-key",
-        type=str,
-        default=None, # Defaults to None, LLMClient will check env var
-        help="OpenAI API key. If not provided, uses OPENAI_API_KEY env variable."
-    )
-    parser.add_argument(
-        "--no-llm-simulator",
-        action="store_true",
-        help="Use heuristic student simulator instead of LLM-based one (reduces API calls)."
-    )
-    parser.add_argument("--teacher-model", type=str, default="gpt-4o",
-                        help="Specify the OpenAI model for the TeacherAgent (e.g., gpt-4o, gpt-4o-mini)")
-    parser.add_argument("--simulator-model", type=str, default="gpt-4o",
-                        help="Specify the OpenAI model for the LLM-based StudentSimulator (e.g., gpt-4o, gpt-4o-mini)")
+    """Main entry point for running evaluations."""
+    start_time = time.time()
+    console = Console(record=True) # Enable recording for saving console output
+    
+    parser = argparse.ArgumentParser(description="Run Synapz evaluation experiments.")
+    parser.add_argument("--size", type=int, default=10, help="Number of experiment pairs to run (learner profile x concept).")
+    parser.add_argument("--turns", type=int, default=5, help="Number of turns per teaching session.")
+    parser.add_argument("--budget", type=float, default=1.0, help="Budget limit for this evaluation run (in USD).")
+    parser.add_argument("--db-path", type=str, default=str(DATA_DIR / "synapz_eval.db"), help="Path to the SQLite database file.")
+    parser.add_argument("--api-key", type=str, default=os.getenv("OPENAI_API_KEY"), help="OpenAI API key.")
+    parser.add_argument("--no-llm-simulator", action="store_true", help="Use heuristic-only student simulator instead of LLM.")
+    parser.add_argument("--teacher-model", type=str, default="gpt-4o-mini", help="LLM model for the teacher agent.")
+    parser.add_argument("--simulator-model", type=str, default="gpt-4o-mini", help="LLM model for the student simulator (if not --no-llm-simulator).")
     parser.add_argument("--learner-id", type=str, default=None,
-                        help="Specify a single learner ID to run an experiment for.")
+                        help="Specify a single learner ID to run an experiment for (must be used with --concept-id).")
     parser.add_argument("--concept-id", type=str, default=None,
                         help="Specify a single concept ID to run an experiment for (must be used with --learner-id).")
-    # TODO: Add argument for specific_combinations if needed, loading from a JSON file perhaps
-
+    parser.add_argument(
+        "--min-pairs-per-profile",
+        type=int,
+        default=None,
+        help="Minimum number of experiment pairs to run for each cognitive profile. Overrides --size if set."
+    )
+    parser.add_argument(
+        "--create-visuals-for",
+        type=str,
+        default=None,
+        metavar="REPORT_PATH",
+        help="Path to a compiled_batch_report.json file to generate visualizations for. Skips experiment run."
+    )
+    
     args = parser.parse_args()
+
+    if not args.api_key:
+        console.print("[bold red]Error: OpenAI API key not found. Please set the OPENAI_API_KEY environment variable or use the --api-key argument.[/bold red]")
+        return
+
+    # Setup logging to a file
+    # Create a timestamped results directory for this batch run
+    # This directory will be created *before* visualization-only mode check
+    # to ensure it exists if visualize_only is used on a report not in a standard batch dir.
+    # However, if args.create_visuals_for is a path, we'll use its parent dir for viz output.
+
+    if args.create_visuals_for:
+        report_to_visualize = Path(args.create_visuals_for)
+        if not report_to_visualize.is_file():
+            console.print(f"[bold red]Error: Report file for visualization not found: {report_to_visualize}[/bold red]")
+            return
+        
+        # Output visualizations in a 'visualizations' subdirectory relative to the report
+        viz_output_dir = report_to_visualize.parent / "visualizations"
+        viz_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        console.print(f"[bold cyan]Generating visualizations for report: {report_to_visualize}[/bold cyan]")
+        console.print(f"Outputting to: {viz_output_dir}")
+        try:
+            create_visualization_from_report(report_to_visualize, viz_output_dir)
+            console.print(f"[bold green]Visualizations generated successfully in {viz_output_dir}[/bold green]")
+        except Exception as e:
+            console.print(f"[bold red]Error generating visualizations: {e}[/bold red]")
+            logger.error("Error during visualization generation for existing report:", exc_info=True)
+        return # Exit after generating visuals
+
+    # --- Normal Experiment Run Logic ---
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    batch_output_dir = Path("results") / f"batch_run_{timestamp}"
+    batch_output_dir.mkdir(parents=True, exist_ok=True)
+
+    log_file_path = batch_output_dir / "evaluation.log"
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler(log_file_path),
+            logging.StreamHandler() # Also print to console
+        ]
+    )
+    logger.info(f"Logging to {log_file_path}")
+    logger.info(f"Batch run started at {timestamp} with args: {args}")
+
+
+    console.print(f"[bold blue]Synapz Evaluation System Initializing...[/bold blue]")
+    console.print(f"Results will be saved in: {batch_output_dir}")
     
     # Setup components
-    console = Console()
     db_path = Path(args.db_path)
     
     # Create directory for database if it doesn't exist
@@ -780,8 +957,11 @@ def main():
     metrics_calculator = MetricsCalculator(db) # Pass db instance
     
     # Display budget before starting
-    current_spend = budget_tracker.get_current_spend()
-    console.print(f"[bold]Starting budget:[/bold] ${current_spend:.4f} / ${args.budget:.2f}")
+    initial_historical_spend = budget_tracker.initial_total_spend_at_run_start
+    run_allowance = budget_tracker.run_budget_allowance
+    console.print(f"[bold]Initial Historical Spend:[/bold] ${initial_historical_spend:.4f}")
+    console.print(f"[bold]Budget Allowance for this Run:[/bold] ${run_allowance:.2f}")
+    console.print(f"[bold]Net Available for this Run:[/bold] ${budget_tracker.get_remaining_run_budget():.2f}")
     
     # Create results directory
     os.makedirs("results", exist_ok=True)
@@ -789,6 +969,8 @@ def main():
     # Determine combinations to test
     available_combinations = get_available_combinations()
     combinations_to_run: Optional[List[Tuple[str, str]]] = None
+    all_learner_ids = sorted(list(set(lc[0] for lc in available_combinations)))
+    all_concept_ids = sorted(list(set(lc[1] for lc in available_combinations)))
 
     if args.learner_id and args.concept_id:
         if (args.learner_id, args.concept_id) in available_combinations:
@@ -796,12 +978,41 @@ def main():
             console.print(f"[bold yellow]Running specific experiment for Learner: {args.learner_id}, Concept: {args.concept_id}[/bold yellow]")
         else:
             console.print(f"[bold red]Error: Specified learner/concept pair ({args.learner_id}, {args.concept_id}) not found in available combinations. Exiting.[/bold red]")
-            return  # Exit if specific pair is invalid
-    elif args.learner_id or args.concept_id:
+            return
+    elif args.min_pairs_per_profile is not None and args.min_pairs_per_profile > 0:
+        console.print(f"[bold yellow]Attempting to run at least {args.min_pairs_per_profile} experiment pairs per profile.[/bold yellow]")
+        combinations_to_run = []
+        if not all_learner_ids:
+            console.print("[bold red]Error: No learner profiles found. Cannot use --min-pairs-per-profile.[/bold red]")
+            return
+        if not all_concept_ids:
+            console.print("[bold red]Error: No concepts found. Cannot use --min-pairs-per-profile.[/bold red]")
+            return
+
+        for learner_id in all_learner_ids:
+            concepts_for_this_learner = [c for l, c in available_combinations if l == learner_id]
+            if not concepts_for_this_learner:
+                console.print(f"[yellow]Warning: No concepts found for learner {learner_id}. Skipping.[/yellow]")
+                continue
+
+            num_to_sample = min(args.min_pairs_per_profile, len(concepts_for_this_learner))
+            if len(concepts_for_this_learner) < args.min_pairs_per_profile:
+                console.print(f"[yellow]Warning: Learner {learner_id} has only {len(concepts_for_this_learner)} concepts. Running with all available for this learner (requested {args.min_pairs_per_profile}).[/yellow]")
+            
+            sampled_concepts = random.sample(concepts_for_this_learner, num_to_sample)
+            for concept_id in sampled_concepts:
+                combinations_to_run.append((learner_id, concept_id))
+        
+        if combinations_to_run:
+            console.print(f"[cyan]Selected a total of {len(combinations_to_run)} experiment pairs based on --min-pairs-per-profile {args.min_pairs_per_profile}.[/cyan]")
+        # Remove duplicates just in case, although sampling unique concepts per learner should prevent this.
+        combinations_to_run = list(set(combinations_to_run))
+        random.shuffle(combinations_to_run) # Shuffle the final list of pairs
+
+    elif args.learner_id or args.concept_id: # Only one is provided
         console.print(f"[bold red]Error: Both --learner-id and --concept-id must be provided together, or neither. Exiting.[/bold red]")
-        return # Exit if only one is provided
-    else:
-        # Default behavior: use --size or all available
+        return
+    else: # Default behavior: use --size or all available
         experiment_size_to_run = args.size
         if len(available_combinations) > experiment_size_to_run:
             combinations_to_run = random.sample(available_combinations, experiment_size_to_run)
@@ -813,7 +1024,6 @@ def main():
         return
 
     # Run batch experiment
-    start_time = time.time()
     results = run_batch_experiment(
         teacher, 
         simulator, 
@@ -827,18 +1037,44 @@ def main():
     )
     end_time = time.time()
     
-    # Display final budget
-    final_spend = budget_tracker.get_current_spend() # budget_tracker is in scope
-    console.print(f"\n[bold]Final budget:[/bold] ${final_spend:.4f} / ${args.budget:.2f}")
-    console.print(f"[bold]Cost of batch evaluation:[/bold] ${final_spend - (final_spend - (results.get('overall_total_cost',0.0))):.4f}") # This seems off, should be final_spend - initial_spend.
-                                                                                                                                        # Let's use overall_total_cost from results
+    # Display final budget details for the run
+    final_historical_spend = budget_tracker.get_current_spend()
+    spend_this_run = budget_tracker.get_current_run_spend()
+    remaining_run_budget_final = budget_tracker.get_remaining_run_budget()
+
+    console.print(f"\n[bold]Run Budget Allowance:[/bold] ${run_allowance:.2f}")
+    console.print(f"[bold]Spend This Run:[/bold] ${spend_this_run:.4f}")
+    if remaining_run_budget_final >= 0:
+        console.print(f"[bold]Remaining Budget for Run:[/bold] ${remaining_run_budget_final:.2f}")
+    else:
+        console.print(f"[bold red]Budget Exceeded for Run by:[/bold] ${abs(remaining_run_budget_final):.2f}")
+    console.print(f"[bold]Total Historical Spend (after run):[/bold] ${final_historical_spend:.4f}")
+    
+    # Cost of batch evaluation reported from results dictionary (which is spend_this_run effectively)
+    overall_total_cost_from_results = results.get("aggregate_results", {}).get("overall_total_cost", 0.0)
+    console.print(f"[bold]Batch Evaluation Cost (from results):[/bold] ${overall_total_cost_from_results:.4f}")
     console.print(f"[bold]Time taken:[/bold] {end_time - start_time:.1f} seconds")
     
-    # Results are now saved inside run_batch_experiment with timestamped folder.
-    # No need for this top-level saving anymore.
-    # with open("results/batch_results.json", "w") as f:
-    #     json.dump(results, f, indent=2)
-    
+    # Save the compiled report
+    compiled_report_path = batch_output_dir / "compiled_batch_report.json"
+    with open(compiled_report_path, 'w') as f:
+        json.dump(results, f, indent=4, cls=NumpyEncoder) # Use NumpyEncoder
+    console.print(f"\n[bold green]📊 Compiled batch report saved to: {compiled_report_path}[/bold green]")
+
+    # Generate visualizations from the compiled report
+    visualization_output_dir = batch_output_dir / "visualizations"
+    visualization_output_dir.mkdir(parents=True, exist_ok=True) # Ensure it exists
+    try:
+        console.print(f"\n[bold cyan]🖼️ Generating visualizations...[/bold cyan]")
+        create_visualization_from_report(compiled_report_path, visualization_output_dir)
+        console.print(f"[bold green]Visualizations generated successfully in {visualization_output_dir}[/bold green]")
+    except Exception as e:
+        console.print(f"[bold red]Error during visualization generation: {e}[/bold red]")
+        logger.error("Error during visualization generation after batch run:", exc_info=True)
+
+    # Save console output
+    console.save_html(batch_output_dir / "console_output.html")
+
     console.print(f"\n[bold green]✅ Batch evaluation completed.[/bold green]")
 
 if __name__ == "__main__":

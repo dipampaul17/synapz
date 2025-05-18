@@ -369,6 +369,78 @@ class DataVisualizer:
         plt.close()
         print(f"Personalization comparison saved to {output_path}")
     
+    def generate_clarity_progression_charts(
+        self,
+        aggregated_turn_clarity_data: Dict[str, Dict[str, Dict[int, List[float]]]],
+        output_dir: Path
+    ) -> None:
+        """
+        Generates line charts showing average clarity progression per turn for each cognitive profile,
+        comparing adaptive vs. control sessions.
+
+        Args:
+            aggregated_turn_clarity_data: Data structured as 
+                {profile_style: {session_type: {turn_number: [clarity_scores]}}}.
+            output_dir: Path to the directory where charts will be saved.
+        """
+        if not aggregated_turn_clarity_data:
+            logger.info("No aggregated turn-by-turn clarity data to visualize.")
+            return
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        for profile_style, sessions_data in aggregated_turn_clarity_data.items():
+            plt.figure(figsize=(10, 6))
+            
+            has_data_for_plot = False
+            max_turn_overall = 0
+
+            for session_type, turns_data in sessions_data.items():
+                if not turns_data: continue
+
+                # Ensure turn numbers are treated as integers
+                try:
+                    # Attempt to convert keys to int for sorting and max()
+                    # Handles cases where keys might be strings like '1', '2'
+                    turn_numbers = sorted([int(k) for k in turns_data.keys()])
+                except ValueError:
+                    logger.warning(f"Could not convert turn numbers to int for profile {profile_style}, session_type {session_type}. Skipping this session type.")
+                    continue # Skip this session_type if keys are not valid integers
+                
+                if not turn_numbers: continue
+                
+                max_turn_for_type = max(turn_numbers) # Now definitely int
+                max_turn_overall = max(max_turn_overall, max_turn_for_type) # max_turn_overall is also int
+
+                avg_clarity_per_turn = [np.mean(turns_data[str(t)]) if str(t) in turns_data and turns_data[str(t)] else (np.mean(turns_data[int(t)]) if int(t) in turns_data and turns_data[int(t)] else np.nan) for t in turn_numbers]
+                
+                # Filter out NaN for plotting if a turn had no data, but keep sequence for x-axis
+                valid_turns = [t for i, t in enumerate(turn_numbers) if not np.isnan(avg_clarity_per_turn[i])]
+                valid_avg_clarity = [avg for avg in avg_clarity_per_turn if not np.isnan(avg)]
+
+                if valid_turns and valid_avg_clarity:
+                    plt.plot(valid_turns, valid_avg_clarity, marker='o', linestyle='-', label=f'{session_type.capitalize()} Avg. Clarity')
+                    has_data_for_plot = True
+            
+            if has_data_for_plot:
+                plt.title(f"Clarity Progression for {profile_style.upper()} Learners", fontsize=15)
+                plt.xlabel("Turn Number", fontsize=12)
+                plt.ylabel("Average Clarity Score (1-5)", fontsize=12)
+                plt.xticks(np.arange(1, max_turn_overall + 1))
+                plt.yticks(np.arange(1, 6))
+                plt.ylim(0.5, 5.5)
+                plt.legend(fontsize=10)
+                plt.grid(True, linestyle='--', alpha=0.7)
+                
+                chart_file_name = f"clarity_progression_{profile_style.lower().replace(' ', '_')}.png"
+                chart_path = output_dir / chart_file_name
+                plt.savefig(chart_path, dpi=300)
+                logger.info(f"Saved clarity progression chart to {chart_path}")
+            else:
+                logger.info(f"No valid data to plot clarity progression for profile: {profile_style}")
+            
+            plt.close() # Close figure for the current profile
+    
     def generate_summary_dashboard(
         self,
         output_file_name: str = "summary_dashboard.png"
@@ -932,38 +1004,22 @@ def create_visualization_from_report(report_path: Path, output_dir: Path) -> Non
     generate_effect_size_chart(report_data, output_dir / "effect_sizes.png") # Updated
     generate_evidence_summary_chart(report_data, output_dir / "evidence_summary.png") # Updated
     
-    # If generate_metrics_dashboard was intended:
-    # generate_metrics_dashboard(report_data, output_dir)
+    # Generate clarity progression charts
+    aggregated_turn_clarity = report_data.get("turn_by_turn_clarity_aggregation")
+    if aggregated_turn_clarity:
+        try:
+            # DEFAULT_DB_PATH is defined at the top of this file and used by DataVisualizer constructor
+            visualizer = DataVisualizer() 
+            visualizer.generate_clarity_progression_charts(
+                aggregated_turn_clarity_data=aggregated_turn_clarity,
+                output_dir=output_dir
+            )
+            logger.info(f"Generated clarity progression charts in {output_dir}")
+        except Exception as e:
+            logger.error(f"Failed to generate clarity progression charts: {e}", exc_info=True)
+            # Optionally, create a placeholder or skip if critical
+    else:
+        logger.warning("No aggregated_turn_clarity_data found in report. Skipping clarity progression charts.")
 
-    logger.info(f"All charts generated and saved to {output_dir.resolve()}")
-
-def main():
-    parser = argparse.ArgumentParser(description="Generate visualizations from Synapz batch evaluation reports.")
-    parser.add_argument(
-        "--report_path", 
-        type=Path, 
-        required=True, # Make required
-        help="Path to the compiled_batch_results.json file."
-    )
-    parser.add_argument(
-        "--output_dir", 
-        type=Path, 
-        required=True, # Make required
-        help="Directory to save generated charts."
-    )
-    args = parser.parse_args()
-
-    # Ensure the input report file exists
-    if not args.report_path.is_file():
-        logger.error(f"Input report file not found: {args.report_path}")
-        print(f"Error: Input report file not found: {args.report_path}")
-        return
-
-    print(f"Attempting to generate visualizations from {args.report_path.resolve()} into {args.output_dir.resolve()}...")
-    
-    create_visualization_from_report(args.report_path, args.output_dir)
-    
-    print(f"Visualizations generated. Check logs for status and specific file paths in: {args.output_dir.resolve()}")
-
-if __name__ == "__main__":
-    main() 
+    # Example: Generate and save a summary metrics table image
+    # This is a placeholder for a more complex image generation
