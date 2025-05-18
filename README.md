@@ -130,7 +130,6 @@ the simulation process leverages multiple evaluation mechanisms:
           </table>
         </div>
         <!-- Using HTML img tag directly within the table cell -->
-        <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="350" alt="Adaptive vs Control Win Rate Chart">
       </td>
       <td>
         <h4>Profile-Specific Results</h4>
@@ -165,6 +164,20 @@ the simulation process leverages multiple evaluation mechanisms:
 </div>
 
 > ⚠️ **truth check:** our latest runs show **weak evidence** for the core thesis with only a 40% win rate for adaptive teaching across all profiles. we need more data and refined approaches for definitive conclusions.
+
+### key visualizations from batch runs
+
+<div align="center">
+  <p>
+    <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/evidence_summary.png" width="400" alt="Adaptive vs Control Win Rate Chart">
+  </p>
+  <p>
+    <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="400" alt="Effect Sizes Chart">
+  </p>
+  <p>
+    <img src="https://raw.githubusercontent.com/dipampaul17/synapz/main/results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="400" alt="Readability Metrics Chart">
+  </p>
+</div>
 
 ## 🔍 initial insights and contradictions
 
@@ -411,8 +424,4 @@ mit license
 <div align="center">
   <p>contributions welcome - the evidence collection journey continues</p>
   <p><a href="https://github.com/dipampaul17/synapz">github.com/dipampaul17/synapz</a></p>
-  <p>
-    <img src="results/batch_run_20250518_091436/visualizations/effect_sizes.png" width="300" alt="Effect Sizes">
-    <img src="results/batch_run_20250518_091436/visualizations/readability_metrics.png" width="300" alt="Readability Metrics">
-  </p>
 </div> 
