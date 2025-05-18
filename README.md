@@ -1,14 +1,13 @@
 <div align="center">
-  <h1 style="font-size: 2.5em; margin-bottom: 0.2em;">synapz ⚡️</h1>
-  <img src=".github/synapz_logo.svg" alt="Synapz Logo" width="180" style="margin-bottom: 0.5em;"/>
-  <h3 style="margin-top: 0; margin-bottom: 0.8em; font-weight: normal;">adaptive learning for neurodiverse students</h3>
-  <p style="margin-top: 0.5em; margin-bottom: 0.5em;">
+  <h1 style="font-size: 2.8em; margin-bottom: 0.4em;">synapz ⚡️</h1>
+  <h3 style="margin-top: 0.4em; margin-bottom: 1em; font-weight: normal;">adaptive learning for neurodiverse students</h3>
+  <p style="margin-top: 0.8em; margin-bottom: 0.8em;">
     <a href="#thought-process--origins"><img src="https://img.shields.io/badge/status-research_prototype-blue?style=flat-square" alt="Status: Research Prototype"></a>
     <a href="#experiment-design"><img src="https://img.shields.io/badge/budget-$50_max-green?style=flat-square" alt="Budget: $50 max"></a>
     <a href="#initial-insights-and-contradictions"><img src="https://img.shields.io/badge/evidence-preliminary-yellow?style=flat-square" alt="Evidence: Preliminary"></a>
     <a href="#installation"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square" alt="License: MIT"></a>
   </p>
-  <p style="margin-top: 0.5em;"><i>if learning isn't adapting to how you think, it isn't really teaching you</i></p>
+  <p style="margin-top: 0.8em;"><i>if learning isn't adapting to how you think, it isn't really teaching you</i></p>
 </div>
 
 ## 📘 about
