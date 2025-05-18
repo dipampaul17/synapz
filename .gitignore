@@ -171,6 +171,7 @@ cython_debug/
 
 # Synapz specific
 results/
+!results/batch_run_*/visualizations/*.png
 viz_prod_batch_run/
 
 # SQLite specific
