@@ -45,9 +45,9 @@ this will create/update a `visualizations` folder next to your report file.
 
 ## 📊 key visualizations & insights from `batch_run_20250518_121146`
 
-the hard numbers (p-values, specific averages, etc.) for our latest comprehensive run are in `results/batch_run_20250518_121146/compiled_batch_results.json` and the detailed `experiment_pair_details.csv`. we encourage you to dig into these files to see the raw and compiled outputs.
+the hard numbers (p-values, specific averages, etc.) for our latest comprehensive run (`batch_run_20250518_121146`, n=33 pairs) are in `results/batch_run_20250518_121146/compiled_batch_results.json` and the detailed `experiment_pair_details.csv`. we encourage you to dig into these files to see the raw and compiled outputs.
 
-the visualizations in `results/batch_run_20250518_121146/visualizations/` help paint the picture:
+the visualizations in `results/batch_run_20250518_121146/visualizations/` help paint the picture. here's a snapshot of what this run suggests:
 
 <div align="center">
   <p style="margin-bottom: 0.5em;"><strong>overall effectiveness & evidence (`evidence_summary.png`, `readability_metrics.png`):</strong></p>
@@ -56,7 +56,7 @@ the visualizations in `results/batch_run_20250518_121146/visualizations/` help p
     <img src="./results/batch_run_20250518_121146/visualizations/readability_metrics.png" width="48%" alt="readability & effectiveness metrics chart">
   </p>
   <p style="font-size: 0.9em; margin-top: 0.2em;">
-    <em>these give a high-level look at adaptive 'win rates' by profile and overall effectiveness scores. are adaptive methods consistently outperforming control? the answer is likely nuanced and varies by profile.</em>
+    <em>in this run of 33 pairs, adaptive teaching achieved a higher final clarity score in 39.4% of cases, while the control (non-adaptive) method never outperformed adaptive teaching (0% control wins). a significant number of pairs (60.6%) resulted in ties for final clarity. overall, the adaptive approach showed a statistically significant improvement in final clarity (p < 0.001). for specific profiles, dyslexic (54.55% win rate, p ≈ 0.026) and visual (54.55% win rate, p ≈ 0.026) learners showed significant benefits, while the results for adhd learners (9.09% win rate, p = 1.0) were not statistically significant in this batch.</em>
   </p>
   <hr style="border: none; height: 1px; background-color: #dddddd; margin: 20px 0;">
   <p style="margin-bottom: 0.5em;"><strong>clarity progression over turns (`clarity_progression_adhd.png`, etc.):</strong></p>
@@ -91,13 +91,13 @@ the visualizations in `results/batch_run_20250518_121146/visualizations/` help p
 
 **emerging (and often messy) insights:**
 
-these points are general observations from the project so far, and you can often see them reflected in the detailed data of runs like `batch_run_20250518_121146` by examining the `experiment_pair_details.csv` and the compiled visualizations:
+these points are general observations, and `batch_run_20250518_121146` provides fresh data to consider:
 
-1.  **adaptation is not magic**: simply telling an llm to "be adaptive" for a profile like "visual learner" doesn't automatically yield superior explanations. the *quality and specificity* of adaptation strategies in the prompts are paramount. superficial changes might not cut it. (examine the `experiment_pair_details.csv` for instances where adaptive scores weren't notably higher than control).
-2.  **profiles are not monoliths**: what works for one "adhd learner" simulation might not for another, depending on the concept's nature and the specific adaptive tactics tried. the visualizations might show different adaptive "win rates" or clarity trajectories even within the same broad profile category. (look for variance in outcomes for the same profile across different concepts in the batch data).
-3.  **simulator fidelity is key (and hard)**: our student simulator (llm + heuristics) tries its best, but it's a proxy. its feedback (clarity, engagement) drives the "measured" success. if the simulator doesn't truly capture a neurodiverse student's interaction patterns, our conclusions are built on a shaky foundation. the heuristic metrics provide a partial cross-check. (consider how different simulated feedback patterns in the raw data contribute to overall scores).
-4.  **"clarity" is multifaceted**: an llm-simulated clarity score is one thing. objective readability scores (like flesch-kincaid from `textstat`) are another. the `effect_sizes.png` might show that adaptive explanations are, say, *more* complex by one metric but perceived as clearer by the simulator. this tension, visible when comparing `readability_metrics.png` and `clarity_progression` charts for `batch_run_20250518_121146`, is where interesting insights lie.
-5.  **statistical significance vs. practical impact**: with enough runs (like the 33 pairs in `batch_run_20250518_121146`), small differences can become statistically significant (low p-values). the `effect_sizes.png` (cohen's d) helps us see if these differences are also practically meaningful. sometimes, an adaptation might be "better" but not by much.
+1.  **adaptation's impact varies**: while adaptive sessions achieved higher final clarity in 39.4% of pairs overall in the latest run, and never lost to control, the effect wasn't universal. the dyslexic and visual profiles showed ~55% win rates for adaptive, but adhd only ~9%. this highlights that the *effectiveness of current adaptive strategies differs significantly across profiles and potentially concepts.* the quality and specificity of adaptation in `prompts/` remain paramount.
+2.  **profiles show diverse responses**: the adhd profile's low win rate (9.09%) and non-significant p-value in `batch_run_20250518_121146` starkly contrasts with dyslexic and visual profiles (~55% win rates, significant p-values). this underscores that a single "adaptive" approach won't be a silver bullet. digging into `experiment_pair_details.csv` for this run can show which adaptive tactics succeeded or failed for specific adhd learner/concept pairs.
+3.  **simulator fidelity is crucial**: the outcomes (like the 60.6% tie rate in final clarity) are based on our simulator. if its sensitivity to subtle learning differences isn't high enough, or if it doesn't fully capture a neurodiverse student's experience, it might mask or misrepresent true effects. the current heuristics (abstractness, etc.) are a starting point.
+4.  **"clarity" metrics tell different stories**: the `compiled_batch_results.json` for `batch_run_20250518_121146` shows final clarity improvements. simultaneously, the `effect_sizes.png` and `readability_metrics.png` (derived from `textstat` scores on the explanations) might show that adaptive explanations have different textual properties (e.g., sentence length, complexity). comparing these helps understand if perceived clarity aligns with standard readability, or if our adaptive strategies are achieving clarity through other means (e.g., structure, examples more than just simpler text).
+5.  **statistical significance and sample size**: `batch_run_20250518_121146` (n=33 total, 11 per profile) yielded significant p-values for dyslexic and visual profiles. however, for adhd, the result wasn't significant. this scale of data is where we start to see trends, but larger runs per profile would increase confidence. the `effect_sizes.png` helps gauge if significant differences are also practically meaningful.
 
 the journey is iterative, and each batch run (like `batch_run_20250518_121146`) is a cycle:
 1.  **analyze results**: we dig into the data (`experiment_pair_details.csv`, `compiled_batch_results.json`) and visualizations from the latest run.
