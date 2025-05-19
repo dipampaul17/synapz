@@ -244,7 +244,18 @@ export openai_api_key='your-api-key' # or pass via --api-key in evaluate.py
 
 ## 🏷️ tags
 
-`adaptive-learning` `cognitive-diversity` `llm-education` `neurodiversity` `adhd` `dyslexia` `visual-learner` `personalized-learning` `prompt-engineering` `educational-technology` `learning-science` `experiment-design` `python` `openai-api` `evidence-based-education`
+<p align="center">
+  <code>adaptive</code> · 
+  <code>neurodiversity</code> · 
+  <code>adhd</code> · 
+  <code>dyslexia</code> · 
+  <code>visual</code><br>
+  <code>llm</code> · 
+  <code>prompting</code> · 
+  <code>personalization</code> · 
+  <code>experiment</code> · 
+  <code>evidence</code>
+</p>
 
 ## 📑 license
 
