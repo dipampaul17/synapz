@@ -2,11 +2,11 @@
   <h1 style="font-size: 2.8em; margin-bottom: 0.4em;">synapz ⚡️</h1>
   <h3 style="margin-top: 0.4em; margin-bottom: 1em; font-weight: normal;">adaptive learning for neurodiverse students</h3>
   <p style="margin-top: 0.8em;"><i>if learning isn't adapting to how you think, it isn't really teaching you</i></p>
-  <p style="margin-top: 0.8em; margin-bottom: 1.2em;">
-    <img src="https://img.shields.io/badge/status-research_prototype-blue?style=flat-square" alt="status: research prototype">
-    <img src="https://img.shields.io/badge/budget-$50_max-green?style=flat-square" alt="budget: $50 max">
-    <img src="https://img.shields.io/badge/evidence-emerging-yellow?style=flat-square" alt="evidence: emerging">
-    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-mit-lightgrey?style=flat-square" alt="license: mit"></a>
+  <p style="margin-top: 1.2em; margin-bottom: 1.5em;">
+    <a href="#core-question-does-tailored-teaching-work-for-neurodiverse-minds" style="display: inline-block; padding: 5px 12px; margin: 0 5px; background-color: #f0f7ff; color: #0366d6; border-radius: 3px; text-decoration: none; font-size: 13px; letter-spacing: 0.5px;">research prototype</a>
+    <a href="#challenges-and-next-steps" style="display: inline-block; padding: 5px 12px; margin: 0 5px; background-color: #e6ffed; color: #22863a; border-radius: 3px; text-decoration: none; font-size: 13px; letter-spacing: 0.5px;">$50 budget</a>
+    <a href="#key-findings" style="display: inline-block; padding: 5px 12px; margin: 0 5px; background-color: #fff8e6; color: #b08800; border-radius: 3px; text-decoration: none; font-size: 13px; letter-spacing: 0.5px;">emerging evidence</a>
+    <a href="./LICENSE" style="display: inline-block; padding: 5px 12px; margin: 0 5px; background-color: #f6f8fa; color: #586069; border-radius: 3px; text-decoration: none; font-size: 13px; letter-spacing: 0.5px;">mit license</a>
   </p>
 </div>
 
