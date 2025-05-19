@@ -188,4 +188,4 @@ viz/
 # Add other specific .db files if they should be ignored
 
 # macOS
-.DS_Store 
+.DS_Store .cursor/
