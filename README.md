@@ -24,7 +24,7 @@ to get real answers, we do paired experiments:
 
 we use a `teacheragent` to generate explanations and a `studentsimulator` (backed by an llm and heuristics) to provide feedback on clarity and engagement. a `budgettracker` keeps us honest on api costs, and a `metricscalculator` crunches the numbers. for instance, our `batch_run_20250518_121146` processed 33 experiment pairs across different profiles and concepts. everything gets logged to a sqlite database (in wal mode, because we like our data safe).
 
-prompts are externalized in the `prompts/` directory – no magic strings in the code.
+our prompt architecture uses a modular design pattern with all templates stored as separate files in the `prompts/` directory. this approach enables rapid iteration on teaching strategies, facilitates a/b testing of different instruction styles, and maintains a clean separation between core logic and language patterns. each profile type (adhd, dyslexic, visual) has dedicated prompt variants optimized for their specific cognitive patterns.
 
 **concept selection**: we deliberately chose mathematical concepts (particularly algebra) as our primary test domain for several reasons:
 * **concrete evaluation**: algebra has objectively correct approaches and solutions, making clarity assessment more reliable
