@@ -37,7 +37,7 @@ class TeacherAgent:
         """Initialize with LLM client, database connection, and teacher model name."""
         self.llm_client = llm_client
         self.db = db
-        self.teacher_model_name = teacher_model_name  # Store the model name
+        self.teacher_model_name = teacher_model_name
         self._load_prompts()
     
     def _load_prompts(self) -> None:
@@ -248,6 +248,102 @@ class TeacherAgent:
             "teaching_strategy": ts_val
         }
     
+    def get_reasoning_response(
+        self, 
+        prompt_text: str, 
+        max_tokens: int,
+        model_name: Optional[str] = None, # Allow overriding model for this specific call
+        temperature: Optional[float] = None # Allow overriding temperature
+    ) -> Tuple[Dict[str, Any], int, int, float]:
+        """
+        Gets a structured response from the LLM based on a provided prompt.
+        This method is designed for experiments like the reasoning_experiment
+        where the prompt is constructed externally.
+
+        Args:
+            prompt_text: The full system prompt to send to the LLM.
+            max_tokens: The maximum number of tokens for the completion.
+            model_name: Optional model name to use, defaults to self.teacher_model_name.
+            temperature: Optional temperature to use, defaults to a standard value (e.g. 0.5).
+
+        Returns:
+            A tuple containing:
+                - response_data (dict): The parsed JSON response from the LLM.
+                - tokens_in (int): Number of input tokens used.
+                - tokens_out (int): Number of output tokens generated.
+                - cost (float): The cost of the API call.
+        """
+        user_prompt = "Provide your response as a valid JSON object, based on the detailed instructions and context given in the system prompt." # Modified to include JSON instruction
+        
+        current_model = model_name if model_name else self.teacher_model_name
+        current_temp = temperature if temperature is not None else 0.5 # Default temp if not specified
+
+        try:
+            result = self.llm_client.get_json_completion(
+                system_prompt=prompt_text,
+                user_prompt=user_prompt, 
+                model=current_model,
+                temperature=current_temp,
+                max_tokens=max_tokens
+            )
+            
+            response_content = result.get("content", {})
+            usage_data = result.get("usage", {"tokens_in": 0, "tokens_out": 0, "cost": 0.0})
+            
+            # Ensure response_content is a dict
+            if not isinstance(response_content, dict):
+                logger.error(f"LLM response content is not a dict. Type: {type(response_content)}. Content: {str(response_content)[:200]}")
+                # Depending on how strict we want to be, we could raise an error or return a default error structure
+                # For reasoning_experiment, it expects a dict. If baseline returns string, it's handled there.
+                # If it's for reasoning and not a dict, it is an issue.
+                # For now, let it pass, reasoning_experiment.py checks its type.
+                # Or, we can try to parse it if it's a string that looks like JSON.
+                if isinstance(response_content, str):
+                    try:
+                        response_content = json.loads(response_content)
+                    except json.JSONDecodeError:
+                        logger.error(f"Failed to parse string response_content to dict. Content: {str(response_content)[:200]}")
+                        # Fallback: wrap in a dict if it's a string and baseline might produce this.
+                        # However, get_json_completion should ideally always return a dict if successful.
+                        # This path indicates an issue with get_json_completion or the LLM response.
+                        # For now, we'll assume get_json_completion handles the JSON parsing.
+                        # If it fails, it should raise an error or return a dict with an error field.
+                        # Let's assume `result["content"]` IS the parsed dict.
+                        pass # Rely on reasoning_experiment.py to handle non-dict if it's from baseline
+
+            return (
+                response_content,
+                usage_data.get("tokens_in", 0),
+                usage_data.get("tokens_out", 0),
+                usage_data.get("cost", 0.0)
+            )
+        except Exception as e:
+            logger.error(f"Error in get_reasoning_response: {e}", exc_info=True)
+            # Return an error structure or re-raise
+            # For now, re-raise to make it visible to the caller
+            raise
+
+    def count_tokens(self, text: str, model: Optional[str] = None) -> int:
+        """Counts the number of tokens in a given text for a specified model."""
+        # This should ideally delegate to self.llm_client if it has a tokenizer
+        if hasattr(self.llm_client, 'count_tokens'):
+            return self.llm_client.count_tokens(text, model if model else self.teacher_model_name)
+        else:
+            # Fallback simple tokenization (not accurate for OpenAI models)
+            logger.warning("LLMClient does not have count_tokens method. Using basic word count as a fallback.")
+            return len(text.split())
+
+
+    def calculate_cost(self, tokens_in: int, tokens_out: int, model: Optional[str] = None) -> float:
+        """Calculates the estimated cost of an API call."""
+        # This should ideally delegate to self.llm_client if it has pricing info
+        if hasattr(self.llm_client, 'calculate_cost'):
+            return self.llm_client.calculate_cost(tokens_in, tokens_out, model if model else self.teacher_model_name)
+        else:
+            # Fallback generic cost (highly inaccurate)
+            logger.warning("LLMClient does not have calculate_cost method. Using a placeholder cost.")
+            return (tokens_in + tokens_out) * 0.000002 # Placeholder cost
+
     def record_feedback(self, interaction_id: str, clarity_score: int) -> None:
         """Record clarity feedback for an interaction."""
         if not 1 <= clarity_score <= 5:

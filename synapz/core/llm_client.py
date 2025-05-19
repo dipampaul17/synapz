@@ -1,339 +1,254 @@
-"""OpenAI API client with budget enforcement and structured outputs."""
-
-import time
-import json
-import random
-import logging
-from typing import Dict, List, Any, Optional, Union, Type, TypeVar, Callable
+import openai
 import os
-from openai import OpenAI, APIError, RateLimitError, APITimeoutError
+import json
+import time
+import tiktoken
+from typing import Dict, Any, Tuple, Optional
+import logging
+from dotenv import load_dotenv
 
-from .budget import BudgetTracker
-
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# Setup logger
 logger = logging.getLogger(__name__)
 
-# Type variable for generic return types
-T = TypeVar('T')
+# Load environment variables from .env file
+# Ensure .env is in the root directory or adjust load_dotenv() call if needed.
+# Example: load_dotenv(Path(__file__).resolve().parent.parent.parent / '.env')
+load_dotenv()
+
+# Default retry parameters
+DEFAULT_MAX_RETRIES = 5
+DEFAULT_INITIAL_BACKOFF = 1.0  # seconds
+DEFAULT_MAX_BACKOFF = 60.0     # seconds
+
+# Pricing information (per token, not per 1k tokens)
+# Source: https://openai.com/pricing (check for updates)
+PRICING_INFO = {
+    "gpt-4o": {"prompt_token_cost": 0.005 / 1000, "completion_token_cost": 0.015 / 1000},
+    "gpt-4-turbo": {"prompt_token_cost": 0.01 / 1000, "completion_token_cost": 0.03 / 1000},
+    "gpt-3.5-turbo": {"prompt_token_cost": 0.0005 / 1000, "completion_token_cost": 0.0015 / 1000},
+    # Add other models as their pricing becomes relevant
+}
 
 class LLMClient:
-    """OpenAI API client with budget enforcement, retries, and structured outputs."""
-    
-    def __init__(self, budget_tracker: BudgetTracker, max_retries: int = 8, api_key: Optional[str] = None):
-        """
-        Initialize with budget tracker and retry settings.
-        
-        Args:
-            budget_tracker: Tracker for managing API costs
-            max_retries: Maximum number of retry attempts (increased to 8)
-            api_key: Optional API key (defaults to environment variable)
-        """
-        # Prioritize provided API key, then check environment variables
-        if api_key is None:
-            api_key = os.environ.get("OPENAI_API_KEY")
-            
-        if not api_key:
-            raise ValueError("API key must be provided either directly or via OPENAI_API_KEY environment variable")
-            
-        self.client = OpenAI(api_key=api_key)
-        self.budget_tracker = budget_tracker
-        self.max_retries = max_retries
-        self.api_key = api_key
-    
-    def _exponential_backoff(self, attempt: int) -> float:
-        """
-        Calculate backoff time with jitter for retries.
-        
-        Args:
-            attempt: Current retry attempt number
-            
-        Returns:
-            Delay in seconds before next retry
-        """
-        base_delay = 20  # Increased from 10
-        max_delay = 120 # Also increasing max_delay
-        delay = min(max_delay, base_delay * (2 ** attempt))
-        jitter = random.uniform(0, 0.1 * delay)
-        return delay + jitter
-    
-    def _format_messages(self, system: str, user: str) -> List[Dict[str, str]]:
-        """
-        Format messages for chat completion.
-        
-        Args:
-            system: System prompt
-            user: User prompt
-            
-        Returns:
-            Formatted messages list for the API
-        """
-        return [
-            {"role": "system", "content": system},
-            {"role": "user", "content": user}
-        ]
-    
-    def get_completion(
-        self, 
-        system_prompt: str, 
-        user_prompt: str,
-        model: str = "gpt-4o-mini",
-        temperature: float = 0.7,
-        max_tokens: int = 800,
-        response_format: Optional[Dict[str, str]] = None
-    ) -> Dict[str, Any]:
-        """
-        Get completion with budget checking, retries, and optional JSON response format.
-        
-        Args:
-            system_prompt: Instructions for the model
-            user_prompt: The user query
-            model: OpenAI model to use
-            temperature: Temperature for response generation
-            max_tokens: Maximum tokens to generate
-            response_format: Optional response format to enforce JSON
-            
-        Returns:
-            Dict with content and usage statistics
-            
-        Raises:
-            ValueError: If budget limit reached or API errors
-        """
-        messages = self._format_messages(system_prompt, user_prompt)
-        
-        # Calculate full prompt for token counting
-        full_prompt = system_prompt + "\n\n" + user_prompt
-        
-        # Project cost before API call
-        projected_cost = self.budget_tracker.project_cost(full_prompt, max_tokens, model)
-        
-        # Check if we'd exceed budget for the current run
-        if self.budget_tracker.run_budget_allowance > 0 and \
-           not self.budget_tracker.check_budget(projected_cost):
-            remaining_run_budget = self.budget_tracker.get_remaining_run_budget()
-            raise ValueError(f"Budget limit for this run reached! Projected cost of ${projected_cost:.4f} "
-                             f"would exceed the remaining run budget of ${remaining_run_budget:.4f}. "
-                             f"(Run allowance: ${self.budget_tracker.run_budget_allowance:.2f}, "
-                             f"Spend this run so far: ${self.budget_tracker.get_current_run_spend():.4f})" )
-        
-        # Try to get completion with retries
-        attempts = 0
-        while attempts < self.max_retries:
-            try:
-                # Set up the API call parameters
-                params = {
-                    "model": model,
-                    "messages": messages,
-                    "temperature": temperature,
-                    "max_tokens": max_tokens
-                }
-                
-                # Add response format if specified
-                if response_format:
-                    params["response_format"] = response_format
-                
-                # Make the API call
-                response = self.client.chat.completions.create(**params)
-                
-                # Extract response content
-                content = response.choices[0].message.content
-                
-                # Track token usage
-                tokens_in = response.usage.prompt_tokens
-                tokens_out = response.usage.completion_tokens
-                
-                # Log token usage
-                self.budget_tracker.log_usage(model, tokens_in, tokens_out)
-                
-                # Calculate actual cost
-                input_cost = self.budget_tracker.PRICE_MAP[model]["input"] * tokens_in / 1_000_000
-                output_cost = self.budget_tracker.PRICE_MAP[model]["output"] * tokens_out / 1_000_000
-                total_cost = input_cost + output_cost
-                
-                return {
-                    "content": content,
-                    "usage": {
-                        "tokens_in": tokens_in,
-                        "tokens_out": tokens_out,
-                        "cost": total_cost
-                    },
-                    "model": model
-                }
-                
-            except RateLimitError as e:
-                attempts += 1
-                if attempts < self.max_retries:
-                    delay = self._exponential_backoff(attempts)
-                    logger.warning(f"Rate limit hit, retrying in {delay:.2f} seconds... (Attempt {attempts}/{self.max_retries})")
-                    time.sleep(delay)
-                else:
-                    logger.error(f"Rate limit exceeded after {attempts} attempts: {str(e)}")
-                    raise ValueError(f"Rate limit exceeded after {attempts} attempts: {str(e)}") from e
-                    
-            except (APIError, APITimeoutError) as e:
-                attempts += 1
-                # Retry on 5xx errors or timeouts, but not on client-side errors (4xx) unless specifically rate limited
-                is_server_error = hasattr(e, 'http_status') and e.http_status >= 500
-                is_timeout = isinstance(e, APITimeoutError)
+    """Client for interacting with OpenAI's Large Language Models."""
 
-                if attempts < self.max_retries and (is_server_error or is_timeout):
-                    delay = self._exponential_backoff(attempts)
-                    logger.warning(f"API error ({type(e).__name__}), retrying in {delay:.2f} seconds... (Attempt {attempts}/{self.max_retries})")
-                    time.sleep(delay)
-                else:
-                    logger.error(f"API error ({type(e).__name__}) not retryable or max retries reached: {str(e)}")
-                    raise ValueError(f"API error: {str(e)}")
-            
-            except Exception as e:
-                logger.error(f"Unexpected error: {str(e)}")
-                raise ValueError(f"Unexpected error: {str(e)}")
+    def __init__(self, 
+                 api_key: Optional[str] = None, 
+                 max_retries: int = DEFAULT_MAX_RETRIES, 
+                 initial_backoff: float = DEFAULT_INITIAL_BACKOFF, 
+                 max_backoff: float = DEFAULT_MAX_BACKOFF):
+        """
+        Initialize the LLMClient.
+
+        Args:
+            api_key: OpenAI API key. If None, loads from OPENAI_API_KEY env var.
+            max_retries: Maximum number of retries for API calls.
+            initial_backoff: Initial backoff time in seconds for retries.
+            max_backoff: Maximum backoff time in seconds.
+        """
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        if not self.api_key:
+            logger.error("OpenAI API key not found. Please set OPENAI_API_KEY environment variable or pass it directly.")
+            raise ValueError("OpenAI API key not found.")
         
-        raise ValueError(f"Failed to get completion after {self.max_retries} attempts")
-    
+        try:
+            self.client = openai.OpenAI(api_key=self.api_key)
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}", exc_info=True)
+            raise ValueError(f"Failed to initialize OpenAI client: {e}")
+
+        self.max_retries = max_retries
+        self.initial_backoff = initial_backoff
+        self.max_backoff = max_backoff
+        self._tokenizer_cache: Dict[str, tiktoken.Encoding] = {}
+
+    def _get_tokenizer(self, model_name: str) -> tiktoken.Encoding:
+        """Get tokenizer for a given model, caching it for efficiency."""
+        if model_name not in self._tokenizer_cache:
+            try:
+                self._tokenizer_cache[model_name] = tiktoken.encoding_for_model(model_name)
+            except KeyError:
+                logger.warning(f"No tokenizer found for model {model_name}. Using cl100k_base as default.")
+                self._tokenizer_cache[model_name] = tiktoken.get_encoding("cl100k_base")
+        return self._tokenizer_cache[model_name]
+
+    def count_tokens(self, text: str, model_name: str) -> int:
+        """
+        Count the number of tokens in a text string for a given model.
+        """
+        if not text:
+            return 0
+        tokenizer = self._get_tokenizer(model_name)
+        return len(tokenizer.encode(text))
+
+    def calculate_cost(self, tokens_in: int, tokens_out: int, model_name: str) -> float:
+        """
+        Calculate the estimated cost of an API call based on token counts and model.
+        """
+        model_pricing = PRICING_INFO.get(model_name)
+        if not model_pricing:
+            # Try to find a base model if it's a versioned model e.g. gpt-4-turbo-preview
+            base_model_name = '-'.join(model_name.split('-')[:2]) # e.g. "gpt-4"
+            model_pricing = PRICING_INFO.get(base_model_name)
+            if not model_pricing:
+                logger.warning(f"Pricing info not found for model {model_name} or base {base_model_name}. Using gpt-3.5-turbo pricing as fallback.")
+                model_pricing = PRICING_INFO.get("gpt-3.5-turbo")
+                if not model_pricing: # Should not happen if gpt-3.5-turbo is in PRICING_INFO
+                    logger.error("Fallback pricing for gpt-3.5-turbo not found. Cost will be 0.")
+                    return 0.0
+        
+        prompt_cost = tokens_in * model_pricing["prompt_token_cost"]
+        completion_cost = tokens_out * model_pricing["completion_token_cost"]
+        return prompt_cost + completion_cost
+
     def get_json_completion(
         self,
         system_prompt: str,
-        user_prompt: str,
-        model: str = "gpt-4o-mini",
-        temperature: float = 0.7,
-        max_tokens: int = 800,
-        parser: Optional[Callable[[str], T]] = None,
-        json_fix_attempts: int = 2 # Max attempts to ask LLM to fix its own JSON
+        user_prompt: str, 
+        model: str,
+        temperature: float = 0.5,
+        max_tokens: int = 1500,
     ) -> Dict[str, Any]:
         """
-        Get completion with JSON format enforcement and optional parsing.
-        Includes retries if the LLM produces invalid JSON.
-        
-        Args:
-            system_prompt: Instructions for the model
-            user_prompt: The user query
-            model: OpenAI model to use
-            temperature: Temperature for response generation
-            max_tokens: Maximum tokens to generate
-            parser: Optional function to parse the JSON string
-            json_fix_attempts: How many times to ask the LLM to fix its own malformed JSON.
-            
-        Returns:
-            Dict with parsed content and usage statistics
-        """
-        current_json_fix_attempt = 0
-        original_user_prompt = user_prompt # Keep original for retry
+        Get a completion from the LLM, expecting a JSON response.
+        Uses exponential backoff for retries on failures.
 
-        while current_json_fix_attempt <= json_fix_attempts:
+        Returns:
+            Dict with "content" (parsed JSON) and "usage" (tokens_in, tokens_out, cost).
+            If JSON parsing fails or API error occurs after retries, 
+            content will be a dict with "error" key and details.
+        """
+        current_backoff = self.initial_backoff
+        retries = 0
+        
+        # Pre-calculate initial prompt tokens for logging and cost estimation of failed attempts
+        projected_prompt_tokens = self.count_tokens(system_prompt + user_prompt, model)
+
+        while retries <= self.max_retries:
             try:
-                # Add JSON format requirement
-                response = self.get_completion(
-                    system_prompt=system_prompt,
-                    user_prompt=user_prompt, # This might be modified in retries
+                logger.info(f"Attempting API call to {model} (Attempt {retries + 1}/{self.max_retries + 1}). Projected prompt tokens: {projected_prompt_tokens}")
+                response = self.client.chat.completions.create(
                     model=model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
                     temperature=temperature,
                     max_tokens=max_tokens,
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"}, 
                 )
                 
-                # Parse the JSON content
-                json_content_str = response["content"]
-                json_content = json.loads(json_content_str)
+                response_content_str = response.choices[0].message.content
                 
-                # Apply custom parser if provided
-                if parser:
-                    json_content = parser(json_content)
-                    
-                # Update the response with parsed content
-                response["content"] = json_content
-                return response # Success
+                # Use actual token counts from response if available
+                actual_prompt_tokens = response.usage.prompt_tokens if response.usage else projected_prompt_tokens
+                completion_tokens = response.usage.completion_tokens if response.usage else self.count_tokens(response_content_str or "", model)
                 
-            except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON response (Attempt {current_json_fix_attempt + 1}/{json_fix_attempts + 1}): {str(e)}")
-                logger.error(f"Raw content: {json_content_str if 'json_content_str' in locals() else 'Content not available'}")
-                
-                current_json_fix_attempt += 1
-                if current_json_fix_attempt <= json_fix_attempts:
-                    logger.warning(f"Retrying JSON parsing by asking LLM to fix. Attempt {current_json_fix_attempt}.")
-                    # Modify user_prompt to include the bad JSON and ask for a fix
-                    user_prompt = (
-                        f"The previous response resulted in a JSON parsing error. Please regenerate the response, ensuring it is a single, valid JSON object that strictly adheres to the schema. \n"
-                        f"Original Prompt was: --- {original_user_prompt[:1000]}... ---\n"
-                        f"Faulty JSON was: --- {json_content_str if 'json_content_str' in locals() else 'Content not available'} ---"
-                        f"Please provide the corrected and complete JSON output only."
-                    )
-                    # No need to change system_prompt, it should still guide overall behavior
-                    time.sleep(self._exponential_backoff(0)) # Small delay before retry for JSON fix
-                else:
-                    logger.error(f"Max JSON fix attempts reached. Raising ValueError.")
-                    raise ValueError(f"Failed to parse JSON response after {json_fix_attempts + 1} attempts: {str(e)}. Last raw content: {json_content_str if 'json_content_str' in locals() else 'N/A'}")
-            except ValueError as ve: # Catch other ValueErrors from self.get_completion (like budget)
-                logger.error(f"ValueError during get_completion call within get_json_completion: {ve}")
-                raise # Re-raise as this is not a JSON parsing issue to be fixed by this loop
+                cost = self.calculate_cost(actual_prompt_tokens, completion_tokens, model)
+                logger.info(f"API call successful. Prompt Tokens: {actual_prompt_tokens}, Completion Tokens: {completion_tokens}, Cost: ${cost:.6f}")
 
-        # Should not be reached if logic is correct, but as a failsafe:
-        raise ValueError(f"Failed to get valid JSON response after all attempts.")
-    
-    def get_embedding(self, text: str, model: str = "text-embedding-3-small") -> Dict[str, Any]:
-        """
-        Get embedding vector for text with budget tracking.
-        
-        Args:
-            text: Text to embed
-            model: Embedding model to use
+                if response_content_str is None: # Should not happen with successful API call asking for content
+                    response_content_str = "{}"
+                    logger.warning("API returned None for response content. Treating as empty JSON.")
+                
+                try:
+                    parsed_json = json.loads(response_content_str)
+                    return {
+                        "content": parsed_json,
+                        "usage": {
+                            "tokens_in": actual_prompt_tokens,
+                            "tokens_out": completion_tokens,
+                            "cost": cost,
+                        },
+                    }
+                except json.JSONDecodeError as e:
+                    logger.error(f"Failed to parse LLM response as JSON: {e}. Response: {response_content_str[:500]}")
+                    return {
+                        "content": {"error": "JSONDecodeError", "message": str(e), "raw_response": response_content_str},
+                        "usage": {"tokens_in": actual_prompt_tokens, "tokens_out": completion_tokens, "cost": cost}
+                    }
+
+            except openai.APIConnectionError as e:
+                logger.warning(f"API Connection Error for model {model}: {e}. Retrying in {current_backoff:.2f}s...")
+            except openai.RateLimitError as e:
+                logger.warning(f"Rate Limit Error for model {model}: {e}. Retrying in {current_backoff:.2f}s...")
+            except openai.APITimeoutError as e:
+                logger.warning(f"API Timeout Error for model {model}: {e}. Retrying in {current_backoff:.2f}s...")
+            except openai.APIStatusError as e:
+                logger.error(f"API Status Error for model {model} (status {e.status_code}): {e.message}. Retrying in {current_backoff:.2f}s...")
+            except Exception as e:
+                logger.error(f"Unexpected error during API call to {model}: {e}", exc_info=True)
             
-        Returns:
-            Dict with embedding vector and usage statistics
-        """
-        # Project cost
-        projected_cost = self.budget_tracker.project_cost(text, 0, model)
-        
-        # Check budget
-        if not self.budget_tracker.check_budget(projected_cost):
-            raise ValueError(f"Budget limit reached! Projected cost of {projected_cost:.4f} "
-                             f"would exceed the remaining budget.")
-        
-        # Try with retries
-        attempts = 0
-        while attempts < self.max_retries:
-            try:
-                # Get embedding
-                response = self.client.embeddings.create(
-                    model=model,
-                    input=text
-                )
-                
-                embedding = response.data[0].embedding
-                tokens = response.usage.prompt_tokens
-                
-                # Log token usage (output tokens are 0 for embeddings)
-                self.budget_tracker.log_usage(model, tokens, 0)
-                
+            retries += 1
+            if retries > self.max_retries:
+                logger.error(f"Max retries ({self.max_retries}) exceeded for API call to {model}.")
+                # Calculate cost based on all failed prompt attempts
+                total_failed_prompt_cost = self.calculate_cost(projected_prompt_tokens * retries, 0, model)
                 return {
-                    "embedding": embedding,
-                    "usage": {
-                        "tokens": tokens,
-                        "cost": self.budget_tracker.PRICE_MAP[model]["input"] * tokens / 1_000_000
-                    },
-                    "model": model
+                    "content": {"error": "MaxRetriesExceeded", "message": f"Failed after {retries} attempts."},
+                    "usage": {"tokens_in": projected_prompt_tokens * retries, "tokens_out": 0, "cost": total_failed_prompt_cost}
                 }
-                
-            except RateLimitError as e:
-                attempts += 1
-                if attempts < self.max_retries:
-                    delay = self._exponential_backoff(attempts)
-                    logger.warning(f"Rate limit hit, retrying in {delay:.2f} seconds... (Attempt {attempts}/{self.max_retries})")
-                    time.sleep(delay)
-                else:
-                    logger.error(f"Rate limit exceeded after {attempts} attempts: {str(e)}")
-                    raise ValueError(f"Rate limit exceeded after {attempts} attempts: {str(e)}") from e
-                    
-            except (APIError, APITimeoutError) as e:
-                attempts += 1
-                is_server_error = hasattr(e, 'http_status') and e.http_status >= 500
-                is_timeout = isinstance(e, APITimeoutError)
-
-                if attempts < self.max_retries and (is_server_error or is_timeout):
-                    delay = self._exponential_backoff(attempts)
-                    logger.warning(f"API error ({type(e).__name__}), retrying in {delay:.2f} seconds... (Attempt {attempts}/{self.max_retries})")
-                    time.sleep(delay)
-                else:
-                    logger.error(f"API error ({type(e).__name__}) not retryable or max retries reached: {str(e)}")
-                    raise ValueError(f"API error: {str(e)}")
+            
+            time.sleep(current_backoff)
+            current_backoff = min(current_backoff * 2, self.max_backoff) # Exponential backoff
         
-        raise ValueError(f"Failed to get embedding after {self.max_retries} attempts") 
+        # Fallback, should ideally not be reached if loop logic is correct
+        logger.critical("Exited retry loop unexpectedly in get_json_completion.")
+        return {
+            "content": {"error": "UnexpectedLoopExit", "message": "Critical error in retry logic."},
+            "usage": {"tokens_in": 0, "tokens_out": 0, "cost": 0.0}
+        }
+
+if __name__ == '__main__':
+    # To run this test: python -m synapz.core.llm_client (from the project root)
+    # Ensure you have a .env file in the project root with your OPENAI_API_KEY
+    
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+    logger.info("LLMClient Test Script Started")
+    
+    try:
+        client = LLMClient()
+        logger.info("LLMClient initialized successfully.")
+
+        test_model = "gpt-4o" # Or "gpt-3.5-turbo"
+        
+        # Test token counting
+        test_text_tokens = "This is a test sentence for token counting."
+        count = client.count_tokens(test_text_tokens, test_model)
+        logger.info(f"Token count for '{test_text_tokens}' with {test_model}: {count}")
+
+        # Test cost calculation
+        prompt_tokens_cost = 150
+        completion_tokens_cost = 250
+        cost_estimate = client.calculate_cost(prompt_tokens_cost, completion_tokens_cost, test_model)
+        logger.info(f"Estimated cost for {prompt_tokens_cost} prompt tokens and {completion_tokens_cost} completion tokens with {test_model}: ${cost_estimate:.6f}")
+
+        # Test JSON completion
+        logger.info(f"\nTesting JSON completion with model: {test_model}...")
+        sys_prompt = "You are an assistant that provides information about planets. Respond in JSON format."
+        usr_prompt = "Tell me about Mars. Include its diameter and primary atmospheric component."
+        
+        api_result = client.get_json_completion(
+            system_prompt=sys_prompt,
+            user_prompt=usr_prompt,
+            model=test_model,
+            temperature=0.2,
+            max_tokens=200
+        )
+        
+        logger.info("API Response Received:")
+        print(json.dumps(api_result, indent=2))
+
+        if "content" in api_result and isinstance(api_result["content"], dict) and "error" not in api_result["content"]:
+            logger.info("Successfully received and parsed JSON response from API.")
+        else:
+            logger.error("Failed to get a valid JSON response from API or an error was reported in the content.")
+            if "content" in api_result and "error" in api_result["content"]:
+                logger.error(f"Error details: {api_result['content']['error']} - {api_result['content'].get('message')}")
+
+    except ValueError as ve:
+        logger.error(f"ValueError during LLMClient test setup or execution: {ve}", exc_info=True)
+    except Exception as ex:
+        logger.error(f"An unexpected error occurred during LLMClient test: {ex}", exc_info=True)
+
+    logger.info("LLMClient Test Script Finished")

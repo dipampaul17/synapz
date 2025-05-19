@@ -128,8 +128,33 @@ class Database:
         )
         """)
         
+        self._create_reasoning_details_table(conn)
+        
         conn.commit()
         conn.close()
+    
+    def _create_reasoning_details_table(self, conn: sqlite3.Connection) -> None:
+        """Create the reasoning_details table if it doesn't exist."""
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS reasoning_details (
+            id TEXT PRIMARY KEY,
+            interaction_id TEXT NOT NULL,
+            condition TEXT NOT NULL, -- "baseline", "visible_reasoning", "hidden_reasoning"
+            reasoning_process_text TEXT,
+            metacognitive_supports_json TEXT, -- JSON list
+            clarity_check_text TEXT,
+            clarity_rating_initial INTEGER,
+            clarity_rating_final INTEGER,
+            clarity_improvement INTEGER,
+            -- Optional: Token counts for individual components if captured
+            -- tokens_reasoning_process INTEGER,
+            -- tokens_metacognitive_supports INTEGER,
+            -- tokens_clarity_check INTEGER,
+            timestamp REAL NOT NULL,
+            FOREIGN KEY (interaction_id) REFERENCES interactions (id)
+        )
+        """)
+        logger.info("Reasoning details table schema checked/created.")
     
     def _get_connection(self) -> sqlite3.Connection:
         """Get a database connection with row factory enabled."""
@@ -367,4 +392,52 @@ class Database:
                     break
         
         conn.close()
-        return pairs 
+        return pairs
+
+    def log_reasoning_detail(
+        self,
+        interaction_id: str,
+        condition: str,
+        reasoning_process_text: Optional[str],
+        metacognitive_supports: Optional[List[str]],
+        clarity_check_text: Optional[str],
+        clarity_ratings: Dict[str, Optional[int]]
+    ) -> str:
+        """Logs a reasoning detail entry linked to an interaction."""
+        reasoning_detail_id = f"reasoning_{uuid.uuid4().hex[:12]}_{interaction_id}"
+        metacognitive_supports_json = json.dumps(metacognitive_supports if metacognitive_supports is not None else [])
+        
+        sql = """
+            INSERT INTO reasoning_details (
+                id, interaction_id, condition, reasoning_process_text,
+                metacognitive_supports_json, clarity_check_text,
+                clarity_rating_initial, clarity_rating_final, clarity_improvement,
+                timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        params = (
+            reasoning_detail_id,
+            interaction_id,
+            condition,
+            reasoning_process_text,
+            metacognitive_supports_json,
+            clarity_check_text,
+            clarity_ratings.get("initial"),
+            clarity_ratings.get("final"),
+            clarity_ratings.get("improvement"),
+            time.time()
+        )
+        
+        conn = self._get_connection()
+        try:
+            conn.execute(sql, params)
+            conn.commit()
+            logger.info(f"Logged reasoning detail {reasoning_detail_id} for interaction {interaction_id}")
+        except sqlite3.Error as e:
+            logger.error(f"SQLite error while logging reasoning detail for interaction {interaction_id}: {e}")
+            # conn.rollback() # Not strictly necessary if commit isn't reached or if connection context manager used
+            raise # Re-raise the exception to make the caller aware
+        finally:
+            conn.close()
+            
+        return reasoning_detail_id 

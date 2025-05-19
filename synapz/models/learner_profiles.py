@@ -4,9 +4,12 @@ import json
 import os
 from typing import Dict, List, Any
 from pathlib import Path
+import logging
 
 from synapz import PACKAGE_ROOT
 from synapz.core.profiles import CognitiveProfile
+
+logger = logging.getLogger(__name__)
 
 # Define profiles directory
 PROFILES_DIR = PACKAGE_ROOT / "models" / "profile_data"
@@ -258,27 +261,45 @@ def write_profiles_to_disk() -> None:
         with open(profile_path, "w") as f:
             json.dump(profile, f, indent=2)
 
-def load_profile(profile_id: str) -> Dict[str, Any]:
+def load_profile(profile_path_str: str) -> Dict[str, Any]:
     """
-    Load a specific cognitive profile by ID.
-    
+    Loads a learner profile from a JSON file.
+
     Args:
-        profile_id: ID of the profile to load
-        
+        profile_path_str: The absolute string path to the learner profile JSON file.
+
     Returns:
-        Profile data dictionary
+        A dictionary containing the learner profile data.
+
+    Raises:
+        FileNotFoundError: If the profile file does not exist.
+        ValueError: If the file content is not valid JSON.
     """
-    # Check if we have it in memory first
-    if profile_id in LEARNER_PROFILES:
-        return LEARNER_PROFILES[profile_id]
+    logger.info(f"load_profile called with: {profile_path_str}")
+    logger.info(f"Current working directory in load_profile: {os.getcwd()}")
+    # profile_path = Path(profile_path_str) # Using os.path now
+    logger.info(f"Using os.path.exists for: {profile_path_str}")
+    logger.info(f"os.path.exists(): {os.path.exists(profile_path_str)}")
+    logger.info(f"os.path.isfile(): {os.path.isfile(profile_path_str)}")
     
-    # Otherwise try to load from disk
-    profile_path = PROFILES_DIR / f"{profile_id}.json"
-    if not profile_path.exists():
-        raise ValueError(f"Profile not found: {profile_id}")
-    
-    with open(profile_path, "r") as f:
-        return json.load(f)
+    if not os.path.exists(profile_path_str):
+        logger.error(f"Learner profile file not found (os.path.exists): {profile_path_str}")
+        raise FileNotFoundError(f"Learner profile file not found: {profile_path_str}")
+    if not os.path.isfile(profile_path_str):
+        logger.error(f"Path is not a file (os.path.isfile): {profile_path_str}")
+        raise FileNotFoundError(f"Path is not a file, cannot load profile: {profile_path_str}")
+
+    try:
+        with open(profile_path_str, 'r', encoding='utf-8') as f:
+            profile_data = json.load(f)
+        logger.info(f"Successfully loaded learner profile from: {profile_path_str}")
+        return profile_data
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in learner profile file: {profile_path_str}. Error: {e}")
+        raise ValueError(f"Invalid JSON in learner profile file: {profile_path_str}. Error: {e}")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred while loading profile {profile_path_str}: {e}", exc_info=True)
+        raise
 
 def get_all_profiles() -> List[Dict[str, Any]]:
     """
@@ -345,4 +366,40 @@ def get_profile_for_adaptation(profile_id: str) -> Dict[str, Any]:
     return profile
 
 # Write profiles on module import
-write_profiles_to_disk() 
+write_profiles_to_disk()
+
+# Example usage (for testing purposes, if run directly)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    # Create a dummy profile for testing
+    # Assumes script is run from synapz/models directory and test_profiles dir is one level up and then into data/profiles
+    # For robust testing, use absolute paths or ensure correct CWD.
+    # This example path is relative and might fail depending on execution context.
+    # A better way would be to use a known test file path.
+    
+    # Construct path relative to this file, assuming project structure synapz/data/profiles
+    try:
+        current_dir = Path(__file__).parent # synapz/models
+        project_root = current_dir.parent # synapz
+        dummy_profile_path = project_root / "data" / "profiles" / "adhd_learner.json"
+        
+        if not dummy_profile_path.exists():
+             # Fallback: Try to create a local dummy if the main one isn't found from this context
+            logger.warning(f"Expected profile {dummy_profile_path} not found. Creating a local dummy for test.")
+            dummy_profile_dir = Path("./test_data/profiles")
+            dummy_profile_dir.mkdir(parents=True, exist_ok=True)
+            dummy_profile_path_local = dummy_profile_dir / "adhd_learner_test.json"
+            with open(dummy_profile_path_local, 'w') as f_dummy:
+                json.dump({"id": "adhd_test", "name": "Test ADHD Learner", "cognitive_style": "adhd"}, f_dummy)
+            profile = load_profile(str(dummy_profile_path_local))
+        else:
+            logger.info(f"Loading profile from project data: {dummy_profile_path}")
+            profile = load_profile(str(dummy_profile_path))
+        
+        print("\nLoaded Profile:")
+        print(json.dumps(profile, indent=2))
+    except FileNotFoundError as e:
+        print(f"Error in example: {e}")
+        print("Please ensure a sample profile exists at '../data/profiles/adhd_learner.json' relative to the project root for this test, or adjust the path.")
+    except Exception as e:
+        print(f"An unexpected error occurred in example: {e}") 

@@ -1,0 +1,9 @@
+reasoning_adhd_experiment:
+  primary_hypothesis: "Explicit reasoning chains will improve clarity for ADHD learners by 25% over baseline"
+  success_criteria:
+    - clarity_improvement: ">= 1.5 points over baseline, p<0.05"
+    - win_rate: ">= 60% vs baseline, p<0.05"
+  secondary_metrics:
+    - reasoning_step_count_correlation: "r > 0.4 with clarity"
+    - token_normalized_improvement: ">= 0.3 points per 1K tokens"
+  ablation_hypothesis: "Visible reasoning will outperform hidden reasoning" 

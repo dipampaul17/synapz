@@ -1,0 +1,104 @@
+experiment_name: "InstrumentedReasoning_ADHD_v1"
+# Unique name for this experimental run
+
+# OpenAI API settings
+api_settings:
+  model: "gpt-4o-mini" # Using a cost-effective model for testing
+  temperature: 0.3 # Controls randomness. Lower is more deterministic.
+  max_tokens_completion: 1500 # Allow for potentially longer reasoning + explanation
+
+paths: # Corrected: Ensure paths are nested under this key
+  prompt_dir: "synapz/prompts/" # Relative to project root
+  concept_dir: "synapz/data/concepts/" # Relative to project root
+  learner_profile_dir: "synapz/data/profiles/" # Relative to project root
+
+# Experiment parameters
+default_learner_profile_id: "adhd_learner"
+# ID of the learner profile to use from synapz/data/profiles/
+
+concepts_to_test:
+  - "binary_search"
+  - "variables"
+  - "systems"
+  - "sequences"
+  - "quadratics"
+  - "inequalities"
+  - "functions"
+  - "factoring"
+  - "exponents"
+  - "expressions"
+  - "equations"
+  # Add more concept IDs from synapz/data/concepts/ as needed
+
+num_pairs_per_condition: 11
+# Number of concept-learner interactions to run for each condition.
+# Ensure concepts_to_test has at least this many items if all are unique.
+
+budget_usd: 0.0 # Set to 0 for no limit in this specific test run, or a positive float for a limit.
+
+output_settings: # Corrected: Nest results_db_path here
+  results_db_path: "synapz/results/reasoning_experiment.db" # Relative to project root
+
+conditions_to_run: # Optional: comment out conditions to run a subset
+  - "baseline"
+  - "visible_reasoning"
+  - "hidden_reasoning"
+#  - "some_other_condition" # Example of how to add more
+
+student_simulation:
+  base_clarity_sd: 0.5 # Standard deviation for the initial clarity score
+  improvement_factor_adhd: 1.2 # Multiplier for clarity improvement with ADHD-specific strategies
+  improvement_factor_general: 1.0 # Multiplier for general good explanation
+  adhd_keywords_for_boost: # Keywords that might indicate ADHD-specific strategies
+    - "chunking"
+    - "visual"
+    - "interactive"
+    - "real-world"
+    - "step-by-step"
+    - "summary"
+    - "checklist"
+    - "break down"
+    - "focus"
+    - "engaging"
+    - "ADHD"
+    - "attention"
+  max_initial_clarity: 3.5 # Max possible initial clarity (scale 1-5)
+  min_final_clarity: 1.0 # Min possible final clarity
+  max_final_clarity: 5.0 # Max possible final clarity
+
+  initial_clarity_factors:
+    long_paragraph_threshold_chars: 220 # Slightly lower to catch more cases
+    long_paragraph_penalty_factor: -0.2 # Noticeable penalty
+    list_item_bonus_factor: 0.15 # Lists are good
+    max_list_item_bonus: 0.6
+    engagement_phrase_bonus_factor: 0.1
+    max_engagement_phrase_bonus: 0.5
+    engagement_phrases:
+      - "what if"
+      - "can you see"
+      - "try to imagine"
+      - "for example:"
+      - "consider this:"
+      - "let's explore"
+      - "think about"
+    overall_length_penalty_threshold_chars: 1800 # If it gets very long
+    overall_length_penalty_factor: -0.25 # Per 200 chars over
+
+  improvement_factors:
+    low_initial_clarity_threshold: 2
+    low_initial_clarity_bonus_factor: 0.6 # Good chance to improve if starting low
+    clarifying_phrase_bonus_factor: 0.2
+    max_clarifying_phrase_bonus: 0.6
+    clarifying_phrases:
+      - "in other words"
+      - "to put it simply"
+      - "step-by-step"
+      - "to clarify"
+      - "essentially"
+      - "the key idea is"
+      - "this means that"
+    short_explanation_threshold_chars: 250 # Too short might not allow much improvement
+    short_explanation_improvement_penalty_factor: -0.3
+    good_length_min_chars: 450
+    good_length_max_chars: 2200
+    good_structure_improvement_bonus: 0.5 # If good length AND has lists (checked in code) 

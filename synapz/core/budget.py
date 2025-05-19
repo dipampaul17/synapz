@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Any
+from typing import Dict, Tuple, Any, Optional
 import tiktoken
 import time
 import sqlite3
@@ -9,6 +9,10 @@ from dataclasses import dataclass
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+class BudgetExceededError(Exception):
+    """Custom exception for when the budget is exceeded."""
+    pass
 
 @dataclass
 class TokenUsage:
@@ -128,23 +132,25 @@ class BudgetTracker:
             
         return (current_spend_this_run + projected_cost) <= self.run_budget_allowance
     
-    def log_usage(self, model: str, tokens_in: int, tokens_out: int) -> None:
+    def log_usage(self, model: str, tokens_in: int, tokens_out: int, cost_usd: Optional[float] = None) -> None:
         """Log token usage to SQLite and update running total for this run."""
-        rates = self.get_model_rates(model)
-        cost = (tokens_in * rates["input"] + tokens_out * rates["output"]) / 1_000_000
+        final_cost = cost_usd
+        if final_cost is None:
+            rates = self.get_model_rates(model)
+            final_cost = (tokens_in * rates["input"] + tokens_out * rates["output"]) / 1_000_000
         
         conn = sqlite3.connect(self.db_path)
         conn.execute(
             "INSERT INTO token_usage (model, tokens_in, tokens_out, cost, timestamp) "
             "VALUES (?, ?, ?, ?, ?)",
-            (model, tokens_in, tokens_out, cost, time.time())
+            (model, tokens_in, tokens_out, final_cost, time.time())
         )
         conn.commit()
         conn.close()
         
-        self.current_run_spend += cost # Tracks spend for current instance lifecycle
+        self.current_run_spend += final_cost # Tracks spend for current instance lifecycle
         total_historical_spend = self._get_db_total_spend() # Should reflect the new entry
-        logger.info(f"Logged usage: {model}, {tokens_in} in, {tokens_out} out, ${cost:.6f}. Spend this run: ${self.current_run_spend:.4f}. Total historical: ${total_historical_spend:.4f}")
+        logger.info(f"Logged usage: {model}, {tokens_in} in, {tokens_out} out, ${final_cost:.6f}. Spend this run: ${self.current_run_spend:.4f}. Total historical: ${total_historical_spend:.4f}")
         
     def get_current_spend(self) -> float:
         """Get current total historical spend from database. For run-specific spend, use get_current_run_spend()."""

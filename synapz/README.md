@@ -1,3 +1,23 @@
+# Synapz Application Core
+
+This directory (`synapz/`) houses the primary source code for the Synapz adaptive learning project.
+
+It is organized into the following key submodules:
+
+*   `analysis/`: Scripts for analyzing experiment results (e.g., `reasoning_analyzer.py`).
+*   `core/`: Core components like the `TeacherAgent`, `LLMClient`, database models (`models.py`), student simulation, and budget tracking.
+*   `data/`: Default data, including concept definitions (`concepts/`), learner profiles (`profiles/`), and data handling utilities.
+*   `examples/`: Example scripts demonstrating how to use various components of the Synapz system.
+*   `experiments/`: Scripts for running specific experimental protocols (e.g., `reasoning_experiment.py`) and their configurations.
+*   `models/`: Modules for loading and managing data structures like concepts (`concept_loader.py`) and learner profiles (`learner_profiles.py`).
+*   `prompts/`: Text files containing the prompt templates used by the LLM agents.
+*   `results/`: (Typically) Default output directory for experiment data and analyses. Note: specific experiment configurations might override this.
+*   `tests/`: Unit and integration tests for the Synapz application.
+
+Main executable scripts like `evaluate.py` (for batch evaluations) and `main.py` (potentially for a different mode of operation or primary entry point) are also located here.
+
+For overall project goals, setup instructions, and high-level experiment results, please refer to the [main README.md file at the project root](../README.md).
+
 # core module
 
 > central components of the synapz adaptive learning system
