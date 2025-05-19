@@ -124,8 +124,8 @@ the goal was to see if (and how) these reasoning strategies impact the explanati
     <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/clarity_improvement.png" width="70%" alt="clarity improvement by reasoning condition"></div>
 *   **reasoning steps & supports**: the `visible_reasoning` and `hidden_reasoning` conditions consistently produced the target 5 reasoning steps and 5 metacognitive supports, demonstrating successful instrumentation. the baseline, as expected, produced none.
     <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/reasoning_steps.png" width="48%" alt="reasoning steps by condition"><img src="./synapz/results/reasoning_experiment_visualizations/metacognitive_supports.png" width="48%" alt="metacognitive supports by condition"></div>
-*   **clarity check questions**: both reasoning conditions consistently included a clarity check question (100% of the time), while the baseline did not. the average length of these questions was also substantial.
-    <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/clarity_check_stats.png" width="70%" alt="clarity check stats by condition"></div>
+*   **clarity check questions**: both reasoning conditions consistently included clarity check questions (100% of the time), while the baseline rarely did so (9.1%). the reasoning conditions also produced substantially longer questions (visible: avg 163 chars, hidden: avg 178 chars) compared to baseline (avg 28 chars), suggesting more specific and targeted comprehension checks.
+
 *   **costs**: the reasoning conditions were slightly more expensive, likely due to the more detailed JSON output structure required, even with similar explanation lengths.
     <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/experiment_costs.png" width="70%" alt="experiment costs by condition"></div>
 
