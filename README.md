@@ -43,6 +43,57 @@ python -m synapz.evaluate --create-visuals-for results/your_batch_run_id/compile
 ```
 this will create/update a `visualizations` folder next to your report file.
 
+## 🔬 reasoning strategies for adhd learners
+
+<div align="center">
+  <p style="margin-bottom: 1em;"><strong>investigating how different reasoning approaches affect adaptive teaching quality</strong></p>
+  <hr style="border: none; height: 1px; background-color: #dddddd; width: 80%; margin: 0 auto 1.5em auto;">
+</div>
+
+we conducted a targeted experiment to understand how structured reasoning affects teaching quality for adhd learners. this experiment compared three distinct conditions:
+
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5em;">
+  <tr>
+    <td style="padding: 8px; width: 33%; vertical-align: top; border-right: 1px solid #eee;">
+      <strong>baseline</strong><br>
+      tutor explains without explicit reasoning about adhd adaptation.
+    </td>
+    <td style="padding: 8px; width: 33%; vertical-align: top; border-right: 1px solid #eee;">
+      <strong>visible reasoning</strong><br>
+      tutor performs 5-stage reasoning and shows this reasoning to the student.
+    </td>
+    <td style="padding: 8px; width: 33%; vertical-align: top;">
+      <strong>hidden reasoning</strong><br>
+      tutor performs the same reasoning internally but doesn't show it to the student.
+    </td>
+  </tr>
+</table>
+
+the goal was to see if (and how) these reasoning strategies impact explanation structure, content, and suitability for an adhd profile, while also instrumenting the llm's internal "thought processes."
+
+**key quantitative observations (n=11 pairs per condition, gpt-4o-mini):**
+
+*   **clarity improvement**: the student clarity simulation showed similar (and modest) clarity gains across all conditions (baseline: ~1.18 pts, visible: ~1.09 pts, hidden: ~1.09 pts). statistically, there was no significant difference (p ≈ 0.56 for visible vs. baseline). this highlights that our current `simulate_student_clarity` heuristic may not be sensitive enough to the nuances of these reasoning-driven explanations.
+    <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/clarity_improvement.png" width="70%" alt="clarity improvement by reasoning condition"></div>
+
+*   **reasoning steps & supports**: the `visible_reasoning` and `hidden_reasoning` conditions consistently produced the target 5 reasoning steps and 5 metacognitive supports, demonstrating successful instrumentation. the baseline, as expected, produced none.
+    <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/reasoning_steps.png" width="48%" alt="reasoning steps by condition"><img src="./synapz/results/reasoning_experiment_visualizations/metacognitive_supports.png" width="48%" alt="metacognitive supports by condition"></div>
+
+*   **clarity check questions**: both reasoning conditions consistently included clarity check questions (100% of the time), while the baseline rarely did so (9.1%). the reasoning conditions also produced substantially longer questions (visible: avg 163 chars, hidden: avg 178 chars) compared to baseline (avg 28 chars), suggesting more specific and targeted comprehension checks.
+
+*   **costs**: the reasoning conditions were slightly more expensive (visible: ~10% higher, hidden: ~8% higher than baseline), likely due to the more detailed JSON output structure required, even with similar explanation lengths. this cost difference was consistent across concept types and remained within our budget parameters.
+
+<div style="background-color: #f8f8f8; padding: 15px; border-left: 3px solid #ccc; margin: 1.5em 0;">
+  <p style="margin-top: 0;"><strong>key insight:</strong> the experiment revealed a counterintuitive pattern - structured reasoning improves explanation quality, but showing that reasoning doesn't help learners. specifically:</p>
+  <ol style="margin-bottom: 0;">
+    <li><strong>reasoning helps teachers, not students</strong>: hidden reasoning produced the most effective explanations. internal structure improved teaching without overwhelming students with process.</li>
+    <li><strong>measurement limitations</strong>: our clarity metrics couldn't detect qualitative differences human learners would notice. structured texts with engagement hooks scored similarly to less structured explanations.</li>
+    <li><strong>cognitive load balance</strong>: visible reasoning created a tradeoff - metacognitive benefits but increased complexity. hidden reasoning maintained depth while preserving accessibility.</li>
+  </ol>
+</div>
+
+this suggests that for adhd learners specifically, how we structure adaptation matters more than whether we adapt. quality of strategy trumps presence of strategy.
+
 ## 📊 latest results: batch_run_20250518_121146
 
 the hard numbers (p-values, specific averages, etc.) for our latest comprehensive run (`batch_run_20250518_121146`, n=33 pairs) are in `results/batch_run_20250518_121146/compiled_batch_results.json` and the detailed `experiment_pair_details.csv`. we encourage you to dig into these files to see the raw and compiled outputs.
@@ -107,38 +158,6 @@ this project evolves through a continuous cycle of discovery and refinement:
 > 3.  **experiment & evaluate**: run a new batch of experiments with `evaluate.py` to test the refinements and generate fresh data.
 
 this learn-adjust-retest loop is fundamental to making progress.
-
-## 🔬 adhd reasoning experiment: process vs. results
-
-we conducted a targeted experiment to understand how llm reasoning affects teaching quality for adhd learners, comparing three conditions:
-
-1.  **baseline**: tutor explains without explicit reasoning about adhd adaptation.
-2.  **visible_reasoning**: tutor performs 5-stage reasoning and shows this reasoning to the student.
-3.  **hidden_reasoning**: tutor performs the same reasoning internally but doesn't show it to the student.
-
-the goal was to see if (and how) these reasoning strategies impact the explanation's structure, content, and suitability for an adhd profile, as well as to instrument our ability to track these internal llm "thought processes."
-
-**key quantitative observations (n=11 pairs per condition, gpt-4o-mini):**
-
-*   **clarity improvement**: the student clarity simulation showed similar (and modest) clarity gains across all conditions (baseline: ~1.18 pts, visible: ~1.09 pts, hidden: ~1.09 pts). statistically, there was no significant difference (p ≈ 0.56 for visible vs. baseline). this highlights that our current `simulate_student_clarity` heuristic may not be sensitive enough to the nuances of these reasoning-driven explanations.
-    <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/clarity_improvement.png" width="70%" alt="clarity improvement by reasoning condition"></div>
-*   **reasoning steps & supports**: the `visible_reasoning` and `hidden_reasoning` conditions consistently produced the target 5 reasoning steps and 5 metacognitive supports, demonstrating successful instrumentation. the baseline, as expected, produced none.
-    <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/reasoning_steps.png" width="48%" alt="reasoning steps by condition"><img src="./synapz/results/reasoning_experiment_visualizations/metacognitive_supports.png" width="48%" alt="metacognitive supports by condition"></div>
-*   **clarity check questions**: both reasoning conditions consistently included clarity check questions (100% of the time), while the baseline rarely did so (9.1%). the reasoning conditions also produced substantially longer questions (visible: avg 163 chars, hidden: avg 178 chars) compared to baseline (avg 28 chars), suggesting more specific and targeted comprehension checks.
-
-*   **costs**: the reasoning conditions were slightly more expensive (visible: ~10% higher, hidden: ~8% higher than baseline), likely due to the more detailed JSON output structure required, even with similar explanation lengths. this cost difference was consistent across concept types and remained within our budget parameters.
-
-**what we learned:**
-
-the experiment revealed a counterintuitive pattern: structured reasoning improves explanation quality, but showing that reasoning doesn't help learners. specifically:
-
-1. **reasoning helps teachers, not students**: hidden reasoning produced the most effective explanations. internal structure improved teaching without overwhelming students with process.
-
-2. **measurement limitations**: our clarity metrics couldn't detect qualitative differences human learners would notice. structured texts with engagement hooks scored similarly to less structured explanations.
-
-3. **cognitive load balance**: visible reasoning created a tradeoff - metacognitive benefits but increased complexity. hidden reasoning maintained depth while preserving accessibility.
-
-this suggests that for adhd learners specifically, how we structure adaptation matters more than whether we adapt. quality of strategy trumps presence of strategy.
 
 ## 🧩 interaction effects and patterns
 
