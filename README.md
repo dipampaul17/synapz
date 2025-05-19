@@ -6,7 +6,7 @@
     <img src="https://img.shields.io/badge/status-research_prototype-blue?style=flat-square" alt="status: research prototype">
     <img src="https://img.shields.io/badge/budget-$50_max-green?style=flat-square" alt="budget: $50 max">
     <img src="https://img.shields.io/badge/evidence-emerging-yellow?style=flat-square" alt="evidence: emerging">
-    <img src="https://img.shields.io/badge/license-mit-lightgrey?style=flat-square" alt="license: mit">
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-mit-lightgrey?style=flat-square" alt="license: mit"></a>
   </p>
 </div>
 
@@ -248,7 +248,7 @@ export openai_api_key='your-api-key' # or pass via --api-key in evaluate.py
 
 ## 📑 license
 
-mit
+this project is licensed under the [mit license](./LICENSE) - see the [license](./LICENSE) file for details.
 
 ---
 
