@@ -126,8 +126,7 @@ the goal was to see if (and how) these reasoning strategies impact the explanati
     <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/reasoning_steps.png" width="48%" alt="reasoning steps by condition"><img src="./synapz/results/reasoning_experiment_visualizations/metacognitive_supports.png" width="48%" alt="metacognitive supports by condition"></div>
 *   **clarity check questions**: both reasoning conditions consistently included clarity check questions (100% of the time), while the baseline rarely did so (9.1%). the reasoning conditions also produced substantially longer questions (visible: avg 163 chars, hidden: avg 178 chars) compared to baseline (avg 28 chars), suggesting more specific and targeted comprehension checks.
 
-*   **costs**: the reasoning conditions were slightly more expensive, likely due to the more detailed JSON output structure required, even with similar explanation lengths.
-    <div align="center"><img src="./synapz/results/reasoning_experiment_visualizations/experiment_costs.png" width="70%" alt="experiment costs by condition"></div>
+*   **costs**: the reasoning conditions were slightly more expensive (visible: ~10% higher, hidden: ~8% higher than baseline), likely due to the more detailed JSON output structure required, even with similar explanation lengths. this cost difference was consistent across concept types and remained within our budget parameters.
 
 **what we learned:**
 
